@@ -63,7 +63,7 @@ Status task: ⬜ 64 todo · 🔄 0 doing · 👀 9 review · ✅ 0 done · ⛔ 0
 | ---- | --- |
 | Tanggal | 2026-11-06 |
 | Posisi | T0.04 `review`: kerangka Laravel 13 terbaru terverifikasi lokal dan di Docker (`make setup` dari salinan bersih 3 mnt 4 dtk, `make test`, modal di browser). Pest, Pint, Larastan, build Vite hijau. |
-| Berikutnya | Salman me-review dan menandatangani `docs/milestones/M0.md` §7 (gate M0). Setelah itu M1: mulai T1.01 (value object Quantity & Money), T1.02, T1.03 dari `main`, satu PR per task. |
+| Berikutnya | Salman menandai task M0 `done` (atau menyuruh AI setelah konfirmasi). Lalu M1 dari `main`: T1.01 (Quantity & Money), T1.02, T1.03, satu PR per task. |
 | Perlu diingat | T0.04 dimulai sebelum T0.02/T0.03 (ISS-009), jadi `todo-summary --check` sengaja gagal sampai keduanya selesai. Versi terbaru belum disetujui architect (ADR-009). Di Mac ini `docker-credential-desktop` belum ada di PATH: tambahkan `/Applications/Docker.app/Contents/Resources/bin`. Test selalu lewat `make test` (DB `_test`). |
 | Menunggu klien | Vendor POS + contoh file (ISS-001), pilihan hosting (ISS-002), sumber data migrasi (ISS-003). |
 
@@ -368,6 +368,7 @@ Satu baris per kejadian penting: task selesai, keputusan, perubahan scope, jawab
 
 | Tanggal | Kejadian | Terkait |
 | ------- | -------- | ------- |
+| 2026-11-06 | Gate M0: Salman menandatangani `docs/milestones/M0.md` (Disetujui; deviasi D1–D6 diterima). Status task M0 tetap `review` sampai Salman menandai `done` | M0 |
 | 2026-11-06 | T0.09 (staging lokal) terverifikasi: smoke test lulus, modal OK di HTTPS+CSP; T0.03 catatan resmi (deviasi D4); `docs/milestones/M0.md` siap sign-off | T0.09, T0.03, ISS-013 |
 | 2026-11-06 | T0.08: proposal budget & timeline (jam per milestone, termin %, asumsi, di luar scope) tanpa tarif | T0.08 |
 | 2026-11-06 | T0.07: rencana sample data (2 profil, 39 skenario); 2 keputusan ditunda ke T3.06 dan M4 | T0.07 |
