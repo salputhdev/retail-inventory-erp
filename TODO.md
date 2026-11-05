@@ -50,7 +50,7 @@
 | M6 — Hardening & Handover | 0/7 | 0/33 | — | ░░░░░░░░░░ 0% | ⬜ belum mulai |
 | **Total** | **0/73** | **0/356** | **—** | **░░░░░░░░░░ 0%** | |
 
-Status task: ⬜ 71 todo · 🔄 0 doing · 👀 2 review · ✅ 0 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 6/172  |  Isu terbuka: 8 (high: 2, menunggu pihak lain: 3)
+Status task: ⬜ 70 todo · 🔄 0 doing · 👀 3 review · ✅ 0 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 9/172  |  Isu terbuka: 3 (high: 0, menunggu pihak lain: 0)
 <!-- progress:end -->
 
 ---
@@ -63,7 +63,7 @@ Status task: ⬜ 71 todo · 🔄 0 doing · 👀 2 review · ✅ 0 done · ⛔ 0
 | ---- | --- |
 | Tanggal | 2026-11-06 |
 | Posisi | T0.04 `review`: kerangka Laravel 13 terbaru terverifikasi lokal dan di Docker (`make setup` dari salinan bersih 3 mnt 4 dtk, `make test`, modal di browser). Pest, Pint, Larastan, build Vite hijau. |
-| Berikutnya | Salman me-merge PR perbaikan T0.05 (#2 di salputhdev/retail-inventory-erp) lalu menyetel proteksi branch `main` (CD-01: CI hijau + 1 review) dengan check Pint, Larastan, Pest + coverage, Audit dependensi, Build aset Vite. Setelah itu T0.09 butuh ADR-006; lainnya masih menunggu T0.01/T0.02. |
+| Berikutnya | T0.02 (NFR + ADR-001..009) lalu T0.06 (ERD), T0.07 (sample data), T0.08 (proposal), T0.09 (staging VPS, menunggu ADR-006). Satu PR per task. |
 | Perlu diingat | T0.04 dimulai sebelum T0.02/T0.03 (ISS-009), jadi `todo-summary --check` sengaja gagal sampai keduanya selesai. Versi terbaru belum disetujui architect (ADR-009). Di Mac ini `docker-credential-desktop` belum ada di PATH: tambahkan `/Applications/Docker.app/Contents/Resources/bin`. Test selalu lewat `make test` (DB `_test`). |
 | Menunggu klien | Vendor POS + contoh file (ISS-001), pilihan hosting (ISS-002), sumber data migrasi (ISS-003). |
 
@@ -74,7 +74,6 @@ Status task: ⬜ 71 todo · 🔄 0 doing · 👀 2 review · ✅ 0 done · ⛔ 0
 *Task `todo` yang semua dependensi task-nya sudah `done`. Dibuat otomatis.*
 
 <!-- ready:start -->
-- **T0.01** Kickoff & validasi pertanyaan Fase 1 (3 jam) · prasyarat eksternal: NDA (C-01)
 - **T0.03** Repository di akun klien (2 jam) · prasyarat eksternal: Akun klien (C-03)
 <!-- ready:end -->
 
@@ -90,7 +89,7 @@ Total: **73 task · 356 jam** (rentang PRD 310–400 jam). Detail tiap task: `do
 
 | ID | Task | Est | Aktual | Kriteria | Bergantung | Status | Selesai | Catatan |
 | -- | ---- | --- | ------ | -------- | ---------- | ------ | ------- | ------- |
-| T0.01 | Kickoff & validasi pertanyaan Fase 1 | 3 | — | 0/3 | NDA (C-01) | ⬜ todo | — | Prasyarat eksternal: NDA harus sudah ditandatangani. |
+| T0.01 | Kickoff & validasi pertanyaan Fase 1 | 3 | — | 3/3 | NDA (C-01) | 👀 review | — | Simulasi portfolio: 10 jawaban = asumsi tertulis di `docs/milestones/M0-kickoff.md`; scope tidak berubah (PRD tetap v0.2); contoh file POS tidak ada, risiko dicatat (sintetis di T0.07) |
 | T0.02 | Kesepakatan target NFR & ADR awal | 4 | — | 0/3 | T0.01 | ⬜ todo | — |  |
 | T0.03 | Repository di akun klien | 2 | — | 0/3 | Akun klien (C-03) | ⬜ todo | — | Prasyarat eksternal: akun/organisasi klien tersedia. |
 | T0.04 | Kerangka project & environment lokal | 5 | — | 3/3 | T0.02, T0.03 | 👀 review | — | Dimulai atas perintah Salman sebelum T0.02/T0.03 (ISS-009). Bukti: `make setup` dari salinan bersih 3 mnt 4 dtk; `make test` hijau; modal lolos di browser tanpa pesan console |
@@ -289,12 +288,12 @@ ID berurutan (ISS-001, ISS-002, …), tidak dipakai ulang. Isu yang selesai diub
 
 | ID | Jenis | Judul | Sev | Status | Terkait | PIC | Dibuka | Ditutup | Catatan |
 | -- | ----- | ----- | --- | ------ | ------- | --- | ------ | ------- | ------- |
-| ISS-001 | question | Vendor/versi POS belum diketahui dan belum ada contoh file export | high | waiting | T0.01, T0.07, T3.03 | Klien | 2026-11-05 | — | PRD §6.1.11 #1, §13.4. Tanpa contoh file, template mapping T3.03 hanya generik |
-| ISS-002 | question | Pilihan hosting belum ada (ADR-006) | high | waiting | T0.09, T6.04 | Klien | 2026-11-05 | — | PRD §6.1.11 #8. Minimal provider harus diketahui sebelum T0.09 |
-| ISS-003 | question | Sumber dan format data migrasi belum diketahui | med | waiting | T2.11, T6.05 | Klien | 2026-11-05 | — | PRD §13.6, §8 |
-| ISS-004 | question | Konfigurasi tim: solo/kecil atau paralel | low | open | M3, M4 | Developer | 2026-11-05 | — | PRD §13.7. Menentukan apakah M3 dan M4 dikerjakan paralel |
+| ISS-001 | question | Vendor/versi POS belum diketahui dan belum ada contoh file export | high | closed | T0.01, T0.07, T3.03 | Klien | 2026-11-05 | 2026-11-06 | Diputuskan sebagai asumsi simulasi: POS generik, ekspor CSV/XLSX (M0-kickoff.md #1) |
+| ISS-002 | question | Pilihan hosting belum ada (ADR-006) | high | closed | T0.09, T6.04 | Klien | 2026-11-05 | 2026-11-06 | Diputuskan sebagai asumsi simulasi: VPS Hostinger untuk staging (M0-kickoff.md #8); ADR-006 di T0.02 |
+| ISS-003 | question | Sumber dan format data migrasi belum diketahui | med | closed | T2.11, T6.05 | Klien | 2026-11-05 | 2026-11-06 | Diputuskan sebagai asumsi simulasi: hanya saldo awal CSV, tanpa riwayat transaksi (M0-kickoff.md #9) |
+| ISS-004 | question | Konfigurasi tim: solo/kecil atau paralel | low | closed | M3, M4 | Developer | 2026-11-05 | 2026-11-06 | Diputuskan: solo, M3 sebelum M4 (M0-kickoff.md) |
 | ISS-005 | question | Software akuntansi dan kebutuhan EDI klien belum diketahui | low | open | WP6.3, WP6.4 | Klien | 2026-11-05 | — | PRD §13.5. Tidak menghambat Fase 1; wajib dijawab sebelum Fase 6 |
-| ISS-006 | question | Konfirmasi asumsi: satu mata uang, pajak tidak dihitung di sistem | low | open | T1.01, PRD §6.1 | Klien | 2026-11-05 | — | Asumsi tertulis di PRD; perlu dikonfirmasi saat T0.01 |
+| ISS-006 | question | Konfirmasi asumsi: satu mata uang, pajak tidak dihitung di sistem | low | closed | T1.01, PRD §6.1 | Klien | 2026-11-05 | 2026-11-06 | Diputuskan: satu mata uang IDR, pajak tidak dihitung (M0-kickoff.md) |
 | ISS-007 | change | Bagian PRD "Penting" belum ditulis: metrik sukses produk, rencana UAT/rilis, daftar layar, notifikasi, glosarium | low | open | PRD | Developer | 2026-11-05 | — | Ditawarkan saat review PRD; tunggu keputusan |
 | ISS-008 | debt | Catatan paralel M3/M4 di Architecture §10.1 tidak cocok dengan dependensi T4.10 → T3.12 | low | closed | T4.10 | Developer | 2026-11-05 | 2026-11-05 | Catatan §10.1 diperbaiki: T4.10 dikerjakan paling akhir di M4 |
 | ISS-009 | risk | T0.04 dimulai sebelum T0.02 (ADR-009 penguncian versi) dan T0.03 (repo klien) selesai; stack dipasang di versi terbaru atas perintah Salman | med | open | T0.04, T0.02, T0.03 | Developer | 2026-11-06 | — | Versi terpasang: Laravel 13.40, Livewire 4.4, Pest 5.3, Larastan 3.14, Bootstrap 5.3.8, Vite 8.3, PHP 8.5, PostgreSQL 18. Harus disetujui architect di ADR-009; bila ditolak, turunkan versi |
@@ -368,6 +367,7 @@ Satu baris per kejadian penting: task selesai, keputusan, perubahan scope, jawab
 
 | Tanggal | Kejadian | Terkait |
 | ------- | -------- | ------- |
+| 2026-11-06 | T0.01 (simulasi): 10 pertanyaan validasi dijawab sebagai asumsi tertulis; ISS-001/002/003/004/006 ditutup; scope tidak berubah | T0.01 |
 | 2026-11-06 | T0.05 terbukti: CI hijau di kode bersih (±40 dtk), merah untuk pelanggaran Pint/Larastan/test, coverage jadi artefak; naik ke `review`. Perbaikan di CI: tests/Unit ditambahkan, Vite dimatikan di test | T0.05 |
 | 2026-11-06 | Repo dipindah ke organisasi salputhdev/retail-inventory-erp; Actions berjalan (ISS-012 closed). CI pertama: Pest gagal karena folder tests/Unit tidak ada | T0.05, ISS-012 |
 | 2026-11-06 | T0.05: workflow CI ditulis; semua run GitHub Actions `startup_failure` (ISS-012), task `blocked` | T0.05, ISS-012 |
