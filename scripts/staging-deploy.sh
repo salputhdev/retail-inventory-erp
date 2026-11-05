@@ -23,7 +23,12 @@ $C up -d pgsql redis
 echo "==> Jalankan aplikasi"
 $C up -d app web
 echo "==> Migrasi (CD-03)"
-for i in $(seq 1 20); do $C exec -T app php artisan migrate --force && break || sleep 3; done
+migrated=0
+for i in $(seq 1 20); do
+  if $C exec -T app php artisan migrate --force; then migrated=1; break; fi
+  sleep 3
+done
+[ "$migrated" = 1 ] || { echo "GAGAL: migrasi tidak berhasil setelah 20 percobaan"; exit 1; }
 echo "==> Cache konfigurasi"
 $C exec -T app php artisan config:cache
 $C exec -T app php artisan route:cache

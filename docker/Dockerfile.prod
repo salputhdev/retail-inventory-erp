@@ -21,7 +21,8 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-interaction --no-progress --no-scripts --prefer-dist
 COPY . .
-RUN composer dump-autoload --no-dev --optimize --no-scripts
+# Tanpa --no-scripts: menjalankan package:discover agar manifest provider hanya berisi paket produksi.
+RUN composer dump-autoload --no-dev --optimize
 
 # ---- Aset frontend
 FROM node:26-slim AS assets
