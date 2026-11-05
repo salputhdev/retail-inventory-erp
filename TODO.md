@@ -50,7 +50,7 @@
 | M6 — Hardening & Handover | 0/7 | 0/33 | — | ░░░░░░░░░░ 0% | ⬜ belum mulai |
 | **Total** | **0/73** | **0/356** | **—** | **░░░░░░░░░░ 0%** | |
 
-Status task: ⬜ 71 todo · 🔄 1 doing · 👀 1 review · ✅ 0 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 3/172  |  Isu terbuka: 8 (high: 2, menunggu pihak lain: 3)
+Status task: ⬜ 71 todo · 🔄 0 doing · 👀 2 review · ✅ 0 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 6/172  |  Isu terbuka: 8 (high: 2, menunggu pihak lain: 3)
 <!-- progress:end -->
 
 ---
@@ -63,7 +63,7 @@ Status task: ⬜ 71 todo · 🔄 1 doing · 👀 1 review · ✅ 0 done · ⛔ 0
 | ---- | --- |
 | Tanggal | 2026-11-06 |
 | Posisi | T0.04 `review`: kerangka Laravel 13 terbaru terverifikasi lokal dan di Docker (`make setup` dari salinan bersih 3 mnt 4 dtk, `make test`, modal di browser). Pest, Pint, Larastan, build Vite hijau. |
-| Berikutnya | Merge PR perbaikan `tests/Unit`, lalu buktikan 3 kriteria T0.05: PR uji dengan pelanggaran Pint/Larastan/test/audit harus merah, artefak coverage ada, durasi ≤ 10 menit. Lalu proteksi branch `main` (CD-01). |
+| Berikutnya | Salman me-merge PR perbaikan T0.05 (#2 di salputhdev/retail-inventory-erp) lalu menyetel proteksi branch `main` (CD-01: CI hijau + 1 review) dengan check Pint, Larastan, Pest + coverage, Audit dependensi, Build aset Vite. Setelah itu T0.09 butuh ADR-006; lainnya masih menunggu T0.01/T0.02. |
 | Perlu diingat | T0.04 dimulai sebelum T0.02/T0.03 (ISS-009), jadi `todo-summary --check` sengaja gagal sampai keduanya selesai. Versi terbaru belum disetujui architect (ADR-009). Di Mac ini `docker-credential-desktop` belum ada di PATH: tambahkan `/Applications/Docker.app/Contents/Resources/bin`. Test selalu lewat `make test` (DB `_test`). |
 | Menunggu klien | Vendor POS + contoh file (ISS-001), pilihan hosting (ISS-002), sumber data migrasi (ISS-003). |
 
@@ -94,7 +94,7 @@ Total: **73 task · 356 jam** (rentang PRD 310–400 jam). Detail tiap task: `do
 | T0.02 | Kesepakatan target NFR & ADR awal | 4 | — | 0/3 | T0.01 | ⬜ todo | — |  |
 | T0.03 | Repository di akun klien | 2 | — | 0/3 | Akun klien (C-03) | ⬜ todo | — | Prasyarat eksternal: akun/organisasi klien tersedia. |
 | T0.04 | Kerangka project & environment lokal | 5 | — | 3/3 | T0.02, T0.03 | 👀 review | — | Dimulai atas perintah Salman sebelum T0.02/T0.03 (ISS-009). Bukti: `make setup` dari salinan bersih 3 mnt 4 dtk; `make test` hijau; modal lolos di browser tanpa pesan console |
-| T0.05 | Pipeline CI | 4 | — | 0/3 | T0.04 | 🔄 doing | — | Run CI pertama di organisasi: 4 dari 5 job hijau; Pest gagal karena `tests/Unit` tidak ada di repo (diperbaiki). Menunggu bukti 3 kriteria |
+| T0.05 | Pipeline CI | 4 | — | 3/3 | T0.04 | 👀 review | — | Bukti: PR uji (#3, ditutup) membuat Pint/Larastan/Pest merah; `npm audit` keluar 1 untuk paket rentan (uji lokal di salinan); artefak `coverage` terunggah; durasi CI ±40 dtk (batas 10 mnt) |
 | T0.06 | Dokumen arsitektur & ERD v1 | 4 | — | 0/2 | T0.02 | ⬜ todo | — |  |
 | T0.07 | Rencana sample data | 2 | — | 0/2 | T0.01 | ⬜ todo | — | Butuh contoh file POS (ISS-001). |
 | T0.08 | Proposal budget & timeline | 3 | — | 0/2 | T0.01, T0.02 | ⬜ todo | — |  |
@@ -368,6 +368,7 @@ Satu baris per kejadian penting: task selesai, keputusan, perubahan scope, jawab
 
 | Tanggal | Kejadian | Terkait |
 | ------- | -------- | ------- |
+| 2026-11-06 | T0.05 terbukti: CI hijau di kode bersih (±40 dtk), merah untuk pelanggaran Pint/Larastan/test, coverage jadi artefak; naik ke `review`. Perbaikan di CI: tests/Unit ditambahkan, Vite dimatikan di test | T0.05 |
 | 2026-11-06 | Repo dipindah ke organisasi salputhdev/retail-inventory-erp; Actions berjalan (ISS-012 closed). CI pertama: Pest gagal karena folder tests/Unit tidak ada | T0.05, ISS-012 |
 | 2026-11-06 | T0.05: workflow CI ditulis; semua run GitHub Actions `startup_failure` (ISS-012), task `blocked` | T0.05, ISS-012 |
 | 2026-11-06 | Repo sementara dibuat di akun pribadi; PR #1 (T0.04) dibuka. Pekerjaan berikutnya menunggu PR #1 di-merge | ISS-011, T0.04 |
