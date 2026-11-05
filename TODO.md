@@ -50,7 +50,7 @@
 | M6 — Hardening & Handover | 0/7 | 0/33 | — | ░░░░░░░░░░ 0% | ⬜ belum mulai |
 | **Total** | **0/73** | **0/356** | **—** | **░░░░░░░░░░ 0%** | |
 
-Status task: ⬜ 66 todo · 🔄 0 doing · 👀 7 review · ✅ 0 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 20/172  |  Isu terbuka: 3 (high: 0, menunggu pihak lain: 0)
+Status task: ⬜ 64 todo · 🔄 0 doing · 👀 9 review · ✅ 0 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 22/172  |  Isu terbuka: 4 (high: 0, menunggu pihak lain: 0)
 <!-- progress:end -->
 
 ---
@@ -63,7 +63,7 @@ Status task: ⬜ 66 todo · 🔄 0 doing · 👀 7 review · ✅ 0 done · ⛔ 0
 | ---- | --- |
 | Tanggal | 2026-11-06 |
 | Posisi | T0.04 `review`: kerangka Laravel 13 terbaru terverifikasi lokal dan di Docker (`make setup` dari salinan bersih 3 mnt 4 dtk, `make test`, modal di browser). Pest, Pint, Larastan, build Vite hijau. |
-| Berikutnya | T0.09 (staging VPS Hostinger): butuh keputusan ADR-006 dan persetujuan Salman untuk menyentuh infrastruktur (domain, SSH key sementara). Setelah itu merge PR berurutan #5 → #6 → #7 → #8 → T0.08 dan gate M0. |
+| Berikutnya | Salman me-review dan menandatangani `docs/milestones/M0.md` §7 (gate M0). Setelah itu M1: mulai T1.01 (value object Quantity & Money), T1.02, T1.03 dari `main`, satu PR per task. |
 | Perlu diingat | T0.04 dimulai sebelum T0.02/T0.03 (ISS-009), jadi `todo-summary --check` sengaja gagal sampai keduanya selesai. Versi terbaru belum disetujui architect (ADR-009). Di Mac ini `docker-credential-desktop` belum ada di PATH: tambahkan `/Applications/Docker.app/Contents/Resources/bin`. Test selalu lewat `make test` (DB `_test`). |
 | Menunggu klien | Vendor POS + contoh file (ISS-001), pilihan hosting (ISS-002), sumber data migrasi (ISS-003). |
 
@@ -74,7 +74,7 @@ Status task: ⬜ 66 todo · 🔄 0 doing · 👀 7 review · ✅ 0 done · ⛔ 0
 *Task `todo` yang semua dependensi task-nya sudah `done`. Dibuat otomatis.*
 
 <!-- ready:start -->
-- **T0.03** Repository di akun klien (2 jam) · prasyarat eksternal: Akun klien (C-03)
+_Tidak ada task yang siap (semua selesai atau terhalang dependensi)._
 <!-- ready:end -->
 
 ---
@@ -91,13 +91,13 @@ Total: **73 task · 356 jam** (rentang PRD 310–400 jam). Detail tiap task: `do
 | -- | ---- | --- | ------ | -------- | ---------- | ------ | ------- | ------- |
 | T0.01 | Kickoff & validasi pertanyaan Fase 1 | 3 | — | 3/3 | NDA (C-01) | 👀 review | — | Simulasi portfolio: 10 jawaban = asumsi tertulis di `docs/milestones/M0-kickoff.md`; scope tidak berubah (PRD tetap v0.2); contoh file POS tidak ada, risiko dicatat (sintetis di T0.07) |
 | T0.02 | Kesepakatan target NFR & ADR awal | 4 | — | 3/3 | T0.01 | 👀 review | — | 28 NFR disepakati (6 dengan catatan, 0 angka diubah) di `docs/milestones/M0-nfr.md`; ADR-001..009 di `docs/adr/`; versi stack tercatat di ADR-009. Persetujuan = merge PR oleh Salman (architect simulasi) |
-| T0.03 | Repository di akun klien | 2 | — | 2/3 | Akun klien (C-03) | ⬜ todo | — | Repo di organisasi salputhdev/retail-inventory-erp (simulasi akun klien). Proteksi `main` aktif: CI hijau (5 check) + 1 review, force-push dan hapus branch ditolak; admin boleh bypass (solo). Template PR (checklist DoD) + CODEOWNERS ditambahkan. Sisa: developer berstatus kolaborator di organisasi klien (tidak bisa disimulasikan solo) |
+| T0.03 | Repository di akun klien | 2 | — | 3/3 | Akun klien (C-03) | 👀 review | — | Catatan resmi di `docs/milestones/M0.md` §4: kriteria 1 (kolaborator) N/A, deviasi D4 diterima Salman; kriteria 2 dan 3 terpenuhi (proteksi `main`, template PR) |
 | T0.04 | Kerangka project & environment lokal | 5 | — | 3/3 | T0.02, T0.03 | 👀 review | — | Dimulai atas perintah Salman sebelum T0.02/T0.03 (ISS-009). Bukti: `make setup` dari salinan bersih 3 mnt 4 dtk; `make test` hijau; modal lolos di browser tanpa pesan console |
 | T0.05 | Pipeline CI | 4 | — | 3/3 | T0.04 | 👀 review | — | Bukti: PR uji (#3, ditutup) membuat Pint/Larastan/Pest merah; `npm audit` keluar 1 untuk paket rentan (uji lokal di salinan); artefak `coverage` terunggah; durasi CI ±40 dtk (batas 10 mnt) |
 | T0.06 | Dokumen arsitektur & ERD v1 | 4 | — | 2/2 | T0.02 | 👀 review | — | ERD v1 di `docs/erd/` (50 tabel/view; 42 tabel PRD §6.1.6 tervalidasi otomatis + 4 framework + 4 tambahan yang diusulkan masuk PRD). Architecture naik ke v0.2 (diff header saja; butuh persetujuan). Tidak ada komentar architect (simulasi) |
 | T0.07 | Rencana sample data | 2 | — | 2/2 | T0.01 | 👀 review | — | `docs/sample-data-plan.md`: 2 profil (demo/load 10.000 SKU, 5.000 trx/hari), 11 skenario POS (6/6 jenis discrepancy), 14 skenario stock count, 14 skenario inventaris/katalog/keamanan. 2 hal terbuka (toleransi price_mismatch, SKU tak dihitung) |
 | T0.08 | Proposal budget & timeline | 3 | — | 2/2 | T0.01, T0.02 | 👀 review | — | `docs/proposal.md`: 356 jam = §10.1 (diverifikasi), kontingensi 12% (batas atas 399 jam), termin sebagai persentase. Tarif/nominal tidak dicantumkan (aturan repo, repo publik) |
-| T0.09 | Staging & deploy otomatis | 6 | — | 0/3 | T0.05, ADR-006 | ⬜ todo | — | Menunggu pilihan hosting (ISS-002). |
+| T0.09 | Staging & deploy otomatis | 6 | — | 1/3 | T0.05, ADR-006 | 👀 review | — | Staging lokal prod-like (VPS dilewati, ADR-006). `make staging-deploy`: smoke test CD-05 lulus (13 OK, 2 SKIP). Kriteria 1 dan 2 disesuaikan (deviasi D1–D3 di M0.md, ISS-013); kriteria 3 (secret) terpenuhi |
 
 ### M1 — Foundation & Master Data (minggu 2–3 · 14 task · 66 jam)
 
@@ -297,6 +297,7 @@ ID berurutan (ISS-001, ISS-002, …), tidak dipakai ulang. Isu yang selesai diub
 | ISS-007 | change | Bagian PRD "Penting" belum ditulis: metrik sukses produk, rencana UAT/rilis, daftar layar, notifikasi, glosarium | low | open | PRD | Developer | 2026-11-05 | — | Ditawarkan saat review PRD; tunggu keputusan |
 | ISS-008 | debt | Catatan paralel M3/M4 di Architecture §10.1 tidak cocok dengan dependensi T4.10 → T3.12 | low | closed | T4.10 | Developer | 2026-11-05 | 2026-11-05 | Catatan §10.1 diperbaiki: T4.10 dikerjakan paling akhir di M4 |
 | ISS-009 | risk | T0.04 dimulai sebelum T0.02 (ADR-009 penguncian versi) dan T0.03 (repo klien) selesai; stack dipasang di versi terbaru atas perintah Salman | med | open | T0.04, T0.02, T0.03 | Developer | 2026-11-06 | — | Versi terpasang: Laravel 13.40, Livewire 4.4, Pest 5.3, Larastan 3.14, Bootstrap 5.3.8, Vite 8.3, PHP 8.5, PostgreSQL 18. Harus disetujui architect di ADR-009; bila ditolak, turunkan versi |
+| ISS-013 | change | T0.09 dilakukan sebagai staging lokal, bukan server: kriteria deploy otomatis ke server dan SSL Labs ≥ A disesuaikan (D1–D3) | med | open | T0.09, ADR-006 | Salman | 2026-11-06 | — | Diputuskan Salman (VPS dilewati: host situs live, 1 vCPU). Terima deviasi saat sign-off M0; hosting produksi nyata = ADR baru |
 | ISS-010 | debt | Docker lokal dan modal Bootstrap di browser belum diuji | med | closed | T0.04 | Developer | 2026-11-06 | 2026-11-06 | `make setup` dari salinan bersih berhasil; modal buka/tutup lolos sebelum dan sesudah re-render Livewire, console bersih. Temuan yang diperbaiki: PECL redis gagal di PHP 8.5, `artisan serve` membuang env Compose, port 5432 bentrok, test sempat menyentuh DB dev (kini dijaga `TestCase` + `make test`) |
 | ISS-011 | risk | Repo di akun GitHub pribadi (salputh/retail-inventory-platform), bukan organisasi klien | low | closed | T0.03, C-03 | Developer | 2026-11-06 | 2026-11-06 | Ditutup: ini proyek portfolio tanpa klien nyata; repo dipublikasikan setelah dipindai (tanpa secret/data klien). T0.03 tetap `todo` sebagai simulasi proses |
 | ISS-012 | bug | GitHub Actions tidak bisa berjalan di akun salputh: billing akun terkunci | high | closed | T0.05 | Salman | 2026-11-06 | 2026-11-06 | Diselesaikan dengan memindahkan repo ke organisasi salputhdev (billing terpisah): Actions berjalan. Repo kini salputhdev/retail-inventory-erp |
@@ -367,6 +368,7 @@ Satu baris per kejadian penting: task selesai, keputusan, perubahan scope, jawab
 
 | Tanggal | Kejadian | Terkait |
 | ------- | -------- | ------- |
+| 2026-11-06 | T0.09 (staging lokal) terverifikasi: smoke test lulus, modal OK di HTTPS+CSP; T0.03 catatan resmi (deviasi D4); `docs/milestones/M0.md` siap sign-off | T0.09, T0.03, ISS-013 |
 | 2026-11-06 | T0.08: proposal budget & timeline (jam per milestone, termin %, asumsi, di luar scope) tanpa tarif | T0.08 |
 | 2026-11-06 | T0.07: rencana sample data (2 profil, 39 skenario); 2 keputusan ditunda ke T3.06 dan M4 | T0.07 |
 | 2026-11-06 | T0.06: ERD v1 dibuat (50 tabel/view, diagram Mermaid per kelompok); Architecture v0.1 → v0.2 | T0.06 |
