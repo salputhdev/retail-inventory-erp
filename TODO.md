@@ -50,7 +50,7 @@
 | M6 — Hardening & Handover | 0/7 | 0/33 | — | ░░░░░░░░░░ 0% | ⬜ belum mulai |
 | **Total** | **0/73** | **0/356** | **—** | **░░░░░░░░░░ 0%** | |
 
-Status task: ⬜ 70 todo · 🔄 0 doing · 👀 3 review · ✅ 0 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 9/172  |  Isu terbuka: 3 (high: 0, menunggu pihak lain: 0)
+Status task: ⬜ 69 todo · 🔄 0 doing · 👀 4 review · ✅ 0 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 12/172  |  Isu terbuka: 3 (high: 0, menunggu pihak lain: 0)
 <!-- progress:end -->
 
 ---
@@ -63,7 +63,7 @@ Status task: ⬜ 70 todo · 🔄 0 doing · 👀 3 review · ✅ 0 done · ⛔ 0
 | ---- | --- |
 | Tanggal | 2026-11-06 |
 | Posisi | T0.04 `review`: kerangka Laravel 13 terbaru terverifikasi lokal dan di Docker (`make setup` dari salinan bersih 3 mnt 4 dtk, `make test`, modal di browser). Pest, Pint, Larastan, build Vite hijau. |
-| Berikutnya | T0.02 (NFR + ADR-001..009) lalu T0.06 (ERD), T0.07 (sample data), T0.08 (proposal), T0.09 (staging VPS, menunggu ADR-006). Satu PR per task. |
+| Berikutnya | T0.06 (ERD v1 di `docs/erd/`), T0.07 (rencana sample data), T0.08 (proposal), lalu T0.09 (staging VPS, butuh keputusan ADR-006). PR ditumpuk: T0.01 → T0.02 → ... merge berurutan. |
 | Perlu diingat | T0.04 dimulai sebelum T0.02/T0.03 (ISS-009), jadi `todo-summary --check` sengaja gagal sampai keduanya selesai. Versi terbaru belum disetujui architect (ADR-009). Di Mac ini `docker-credential-desktop` belum ada di PATH: tambahkan `/Applications/Docker.app/Contents/Resources/bin`. Test selalu lewat `make test` (DB `_test`). |
 | Menunggu klien | Vendor POS + contoh file (ISS-001), pilihan hosting (ISS-002), sumber data migrasi (ISS-003). |
 
@@ -90,7 +90,7 @@ Total: **73 task · 356 jam** (rentang PRD 310–400 jam). Detail tiap task: `do
 | ID | Task | Est | Aktual | Kriteria | Bergantung | Status | Selesai | Catatan |
 | -- | ---- | --- | ------ | -------- | ---------- | ------ | ------- | ------- |
 | T0.01 | Kickoff & validasi pertanyaan Fase 1 | 3 | — | 3/3 | NDA (C-01) | 👀 review | — | Simulasi portfolio: 10 jawaban = asumsi tertulis di `docs/milestones/M0-kickoff.md`; scope tidak berubah (PRD tetap v0.2); contoh file POS tidak ada, risiko dicatat (sintetis di T0.07) |
-| T0.02 | Kesepakatan target NFR & ADR awal | 4 | — | 0/3 | T0.01 | ⬜ todo | — |  |
+| T0.02 | Kesepakatan target NFR & ADR awal | 4 | — | 3/3 | T0.01 | 👀 review | — | 28 NFR disepakati (6 dengan catatan, 0 angka diubah) di `docs/milestones/M0-nfr.md`; ADR-001..009 di `docs/adr/`; versi stack tercatat di ADR-009. Persetujuan = merge PR oleh Salman (architect simulasi) |
 | T0.03 | Repository di akun klien | 2 | — | 0/3 | Akun klien (C-03) | ⬜ todo | — | Prasyarat eksternal: akun/organisasi klien tersedia. |
 | T0.04 | Kerangka project & environment lokal | 5 | — | 3/3 | T0.02, T0.03 | 👀 review | — | Dimulai atas perintah Salman sebelum T0.02/T0.03 (ISS-009). Bukti: `make setup` dari salinan bersih 3 mnt 4 dtk; `make test` hijau; modal lolos di browser tanpa pesan console |
 | T0.05 | Pipeline CI | 4 | — | 3/3 | T0.04 | 👀 review | — | Bukti: PR uji (#3, ditutup) membuat Pint/Larastan/Pest merah; `npm audit` keluar 1 untuk paket rentan (uji lokal di salinan); artefak `coverage` terunggah; durasi CI ±40 dtk (batas 10 mnt) |
@@ -328,15 +328,15 @@ Teks lengkap di `docs/adr/` (dibuat di T0.02). Status di bawah disalin dari Arch
 
 | ADR | Keputusan | Status | Tanggal diputuskan |
 | --- | --------- | ------ | ------------------ |
-| ADR-001 | Modular monolith Laravel, bukan microservice | Usulan | — |
-| ADR-002 | Ledger immutable + `stock_levels` sebagai cache | Usulan | — |
-| ADR-003 | Scope lokasi: pivot `location_user` + global scope + Policy (bukan fitur *teams* Spatie) | Usulan | — |
+| ADR-001 | Modular monolith Laravel, bukan microservice | Disetujui (simulasi; berlaku saat PR T0.02 di-merge) | 2026-11-06 |
+| ADR-002 | Ledger immutable + `stock_levels` sebagai cache | Disetujui (simulasi; berlaku saat PR T0.02 di-merge) | 2026-11-06 |
+| ADR-003 | Scope lokasi: pivot `location_user` + global scope + Policy (bukan fitur *teams* Spatie) | Disetujui (simulasi; berlaku saat PR T0.02 di-merge) | 2026-11-06 |
 | ADR-004 | UI Livewire + Bootstrap; aturan widget JS Bootstrap (§6) | Disetujui (PRD v0.2) | 2026-11-05 (PRD v0.2) |
-| ADR-005 | Redis + Horizon untuk queue, cache, session | Usulan | — |
-| ADR-006 | Hosting, backup & PITR (managed PostgreSQL vs VPS + WAL-G/pgBackRest) | Menunggu pilihan hosting klien | — |
-| ADR-007 | Alat browser testing (Pest browser/Playwright vs Dusk) | Usulan | — |
-| ADR-008 | Costing weighted average di Fase 1; FIFO lewat `cost_layers` di Fase 2 | Usulan | — |
-| ADR-009 | Versi Laravel, PHP, Livewire, Bootstrap, PostgreSQL dikunci saat M0 | Usulan | — |
+| ADR-005 | Redis + Horizon untuk queue, cache, session | Disetujui (simulasi; berlaku saat PR T0.02 di-merge) | 2026-11-06 |
+| ADR-006 | Hosting, backup & PITR (managed PostgreSQL vs VPS + WAL-G/pgBackRest) | Usulan: VPS Hostinger; keputusan akhir di T0.09 (tenggat awal M1) | — |
+| ADR-007 | Alat browser testing (Pest browser/Playwright vs Dusk) | Disetujui (simulasi; berlaku saat PR T0.02 di-merge) | 2026-11-06 |
+| ADR-008 | Costing weighted average di Fase 1; FIFO lewat `cost_layers` di Fase 2 | Disetujui (simulasi; berlaku saat PR T0.02 di-merge) | 2026-11-06 |
+| ADR-009 | Versi Laravel, PHP, Livewire, Bootstrap, PostgreSQL dikunci saat M0 | Disetujui (simulasi; berlaku saat PR T0.02 di-merge) | 2026-11-06 |
 | ADR-010 | Outbox pattern untuk sinkron keluar (Fase 4+) | Ditunda ke Fase 4 | — |
 | ADR-011 | Kontrak forecast service (Fase 5) | Ditunda ke Fase 5 | — |
 | ADR-012 | Strategi multi-tenant (Fase 7) | Ditunda ke Fase 7 | — |
@@ -367,6 +367,7 @@ Satu baris per kejadian penting: task selesai, keputusan, perubahan scope, jawab
 
 | Tanggal | Kejadian | Terkait |
 | ------- | -------- | ------- |
+| 2026-11-06 | T0.02: 28 target NFR disepakati (tanpa perubahan angka), ADR-001..009 ditulis (ADR-006 usulan VPS, keputusan di T0.09) | T0.02, ADR-001..009 |
 | 2026-11-06 | T0.01 (simulasi): 10 pertanyaan validasi dijawab sebagai asumsi tertulis; ISS-001/002/003/004/006 ditutup; scope tidak berubah | T0.01 |
 | 2026-11-06 | T0.05 terbukti: CI hijau di kode bersih (±40 dtk), merah untuk pelanggaran Pint/Larastan/test, coverage jadi artefak; naik ke `review`. Perbaikan di CI: tests/Unit ditambahkan, Vite dimatikan di test | T0.05 |
 | 2026-11-06 | Repo dipindah ke organisasi salputhdev/retail-inventory-erp; Actions berjalan (ISS-012 closed). CI pertama: Pest gagal karena folder tests/Unit tidak ada | T0.05, ISS-012 |
