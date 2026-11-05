@@ -45,3 +45,32 @@ fresh:
 
 shell:
 	$(APP) bash
+
+## ---- Staging lokal prod-like (T0.09, ADR-006) ----
+STG = docker compose -f compose.staging.yml --env-file .env.staging
+
+.PHONY: staging-env staging-deploy staging-smoke staging-watch staging-down staging-logs
+
+staging-env:
+	scripts/staging-env.sh
+
+staging-deploy:
+	scripts/staging-deploy.sh
+
+staging-smoke:
+	scripts/smoke-test.sh https://localhost:8443 http://localhost:8080
+
+# Deploy otomatis dari main: poll origin/main tiap 60 detik, deploy bila ada commit baru.
+staging-watch:
+	@echo "Memantau origin/main (Ctrl+C untuk berhenti)"; \
+	last=""; while true; do \
+	  git fetch -q origin main; cur=$$(git rev-parse origin/main); \
+	  if [ "$$cur" != "$$last" ]; then \
+	    echo "Commit baru: $$cur"; git switch -q main && git pull -q --ff-only origin main && scripts/staging-deploy.sh && last=$$cur || echo "Deploy gagal, coba lagi"; \
+	  fi; sleep 60; done
+
+staging-down:
+	$(STG) down
+
+staging-logs:
+	$(STG) logs -f --tail=100

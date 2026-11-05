@@ -11,7 +11,7 @@ Persetujuan: proyek ini portfolio tanpa architect klien, jadi persetujuan dilaku
 | [ADR-003](ADR-003.md) | Scope lokasi: pivot `location_user` + global scope + Policy | Disetujui |
 | [ADR-004](ADR-004.md) | UI Livewire + Bootstrap; aturan widget JS Bootstrap | Disetujui |
 | [ADR-005](ADR-005.md) | Redis + Horizon untuk queue, cache, session | Disetujui |
-| [ADR-006](ADR-006.md) | Hosting, backup, dan PITR | Usulan (ditunda ke T0.09) |
+| [ADR-006](ADR-006.md) | Hosting, backup, dan PITR | Diputuskan sebagian: staging lokal; produksi belum |
 | [ADR-007](ADR-007.md) | Alat browser testing: Pest browser (Playwright) | Disetujui |
 | [ADR-008](ADR-008.md) | Costing weighted average di Fase 1; FIFO di Fase 2 | Disetujui |
 | [ADR-009](ADR-009.md) | Versi stack dikunci saat M0 | Disetujui |

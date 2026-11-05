@@ -43,3 +43,7 @@ Thumbs.db
 
 # Skill pribadi developer, bukan bagian repo klien
 /personal-skills/
+
+# Staging lokal: secret dan sertifikat tidak boleh di-commit
+!.env.staging.example
+/docker/nginx/certs/

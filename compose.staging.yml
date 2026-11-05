@@ -1,0 +1,40 @@
+# Staging lokal prod-like (T0.09, ADR-006): image produksi, Nginx + PHP-FPM, TLS, secret dari .env.staging (tidak di-commit).
+# Pakai lewat Makefile: make staging-deploy
+name: retail-staging
+services:
+  app:
+    build: { context: ., dockerfile: docker/Dockerfile.prod, target: app }
+    image: retail-inventory-app:staging
+    env_file: [.env.staging]
+    restart: unless-stopped
+    depends_on:
+      pgsql: { condition: service_healthy }
+      redis: { condition: service_started }
+
+  web:
+    build: { context: ., dockerfile: docker/Dockerfile.prod, target: web }
+    image: retail-inventory-web:staging
+    ports: ["8080:80", "8443:443"]
+    volumes: ["./docker/nginx/certs:/etc/nginx/certs:ro"]
+    restart: unless-stopped
+    depends_on: [app]
+
+  pgsql:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes: ["pgdata:/var/lib/postgresql"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+
+volumes:
+  pgdata:
