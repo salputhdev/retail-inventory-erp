@@ -5,8 +5,8 @@
 | Dokumen acuan  | `PRD-retail-inventory.md` v0.2 (requirement, user story, NFR), `project-brief-retail-inventory.md`        |
 | Tech stack     | Laravel · Livewire · Alpine.js · Bootstrap · PostgreSQL · Redis + Horizon (+ Python/FastAPI di Fase 5)    |
 | Cakupan        | Arsitektur seluruh fase; rencana implementasi Fase 1 dirinci per task, Fase 2–7 per paket kerja          |
-| Versi          | 0.1 — 5 November 2026                                                                                    |
-| Status         | Draft — direview systems architect klien di M0 (T0.06)                                                    |
+| Versi          | 0.2 — 6 November 2026 (ADR-001..009 di `docs/adr/`, ERD v1 di `docs/erd/`; tanpa komentar architect: proyek portfolio) |
+| Status         | Direview di M0 (T0.06); persetujuan = merge PR oleh Salman (berperan sebagai architect)                   |
 
 ---
 
