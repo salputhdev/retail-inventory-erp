@@ -50,7 +50,7 @@
 | M6 — Hardening & Handover | 0/7 | 0/33 | — | ░░░░░░░░░░ 0% | ⬜ belum mulai |
 | **Total** | **0/73** | **0/356** | **—** | **░░░░░░░░░░ 0%** | |
 
-Status task: ⬜ 68 todo · 🔄 0 doing · 👀 5 review · ✅ 0 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 14/172  |  Isu terbuka: 3 (high: 0, menunggu pihak lain: 0)
+Status task: ⬜ 67 todo · 🔄 0 doing · 👀 6 review · ✅ 0 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 16/172  |  Isu terbuka: 3 (high: 0, menunggu pihak lain: 0)
 <!-- progress:end -->
 
 ---
@@ -63,7 +63,7 @@ Status task: ⬜ 68 todo · 🔄 0 doing · 👀 5 review · ✅ 0 done · ⛔ 0
 | ---- | --- |
 | Tanggal | 2026-11-06 |
 | Posisi | T0.04 `review`: kerangka Laravel 13 terbaru terverifikasi lokal dan di Docker (`make setup` dari salinan bersih 3 mnt 4 dtk, `make test`, modal di browser). Pest, Pint, Larastan, build Vite hijau. |
-| Berikutnya | T0.07 (rencana sample data), T0.08 (proposal), lalu T0.09 (staging VPS, butuh keputusan ADR-006). PR ditumpuk berurutan T0.01 → T0.02 → T0.06 → ... |
+| Berikutnya | T0.08 (proposal), lalu T0.09 (staging VPS, butuh keputusan ADR-006). PR ditumpuk berurutan T0.01 → T0.02 → T0.06 → T0.07 → ... Terbuka: toleransi price_mismatch (T3.06), perilaku SKU tak dihitung (M4). |
 | Perlu diingat | T0.04 dimulai sebelum T0.02/T0.03 (ISS-009), jadi `todo-summary --check` sengaja gagal sampai keduanya selesai. Versi terbaru belum disetujui architect (ADR-009). Di Mac ini `docker-credential-desktop` belum ada di PATH: tambahkan `/Applications/Docker.app/Contents/Resources/bin`. Test selalu lewat `make test` (DB `_test`). |
 | Menunggu klien | Vendor POS + contoh file (ISS-001), pilihan hosting (ISS-002), sumber data migrasi (ISS-003). |
 
@@ -95,7 +95,7 @@ Total: **73 task · 356 jam** (rentang PRD 310–400 jam). Detail tiap task: `do
 | T0.04 | Kerangka project & environment lokal | 5 | — | 3/3 | T0.02, T0.03 | 👀 review | — | Dimulai atas perintah Salman sebelum T0.02/T0.03 (ISS-009). Bukti: `make setup` dari salinan bersih 3 mnt 4 dtk; `make test` hijau; modal lolos di browser tanpa pesan console |
 | T0.05 | Pipeline CI | 4 | — | 3/3 | T0.04 | 👀 review | — | Bukti: PR uji (#3, ditutup) membuat Pint/Larastan/Pest merah; `npm audit` keluar 1 untuk paket rentan (uji lokal di salinan); artefak `coverage` terunggah; durasi CI ±40 dtk (batas 10 mnt) |
 | T0.06 | Dokumen arsitektur & ERD v1 | 4 | — | 2/2 | T0.02 | 👀 review | — | ERD v1 di `docs/erd/` (50 tabel/view; 42 tabel PRD §6.1.6 tervalidasi otomatis + 4 framework + 4 tambahan yang diusulkan masuk PRD). Architecture naik ke v0.2 (diff header saja; butuh persetujuan). Tidak ada komentar architect (simulasi) |
-| T0.07 | Rencana sample data | 2 | — | 0/2 | T0.01 | ⬜ todo | — | Butuh contoh file POS (ISS-001). |
+| T0.07 | Rencana sample data | 2 | — | 2/2 | T0.01 | 👀 review | — | `docs/sample-data-plan.md`: 2 profil (demo/load 10.000 SKU, 5.000 trx/hari), 11 skenario POS (6/6 jenis discrepancy), 14 skenario stock count, 14 skenario inventaris/katalog/keamanan. 2 hal terbuka (toleransi price_mismatch, SKU tak dihitung) |
 | T0.08 | Proposal budget & timeline | 3 | — | 0/2 | T0.01, T0.02 | ⬜ todo | — |  |
 | T0.09 | Staging & deploy otomatis | 6 | — | 0/3 | T0.05, ADR-006 | ⬜ todo | — | Menunggu pilihan hosting (ISS-002). |
 
@@ -367,6 +367,7 @@ Satu baris per kejadian penting: task selesai, keputusan, perubahan scope, jawab
 
 | Tanggal | Kejadian | Terkait |
 | ------- | -------- | ------- |
+| 2026-11-06 | T0.07: rencana sample data (2 profil, 39 skenario); 2 keputusan ditunda ke T3.06 dan M4 | T0.07 |
 | 2026-11-06 | T0.06: ERD v1 dibuat (50 tabel/view, diagram Mermaid per kelompok); Architecture v0.1 → v0.2 | T0.06 |
 | 2026-11-06 | T0.02: 28 target NFR disepakati (tanpa perubahan angka), ADR-001..009 ditulis (ADR-006 usulan VPS, keputusan di T0.09) | T0.02, ADR-001..009 |
 | 2026-11-06 | T0.01 (simulasi): 10 pertanyaan validasi dijawab sebagai asumsi tertulis; ISS-001/002/003/004/006 ditutup; scope tidak berubah | T0.01 |
