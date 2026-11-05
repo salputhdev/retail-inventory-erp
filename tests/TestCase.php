@@ -8,6 +8,14 @@ use RuntimeException;
 
 abstract class TestCase extends BaseTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Test tidak boleh bergantung pada hasil build aset (public/build tidak ada di CI).
+        $this->withoutVite();
+    }
+
     /**
      * Pengaman: RefreshDatabase menjalankan migrate:fresh, jadi test tidak
      * boleh pernah menyentuh database selain database test.
