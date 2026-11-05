@@ -11,3 +11,4 @@ parameters:
         - tests
     excludePaths:
         - app/Domain/*/*/.gitkeep
+        - tests/Fixtures/StaticAnalysis/FloatAssignment.php
