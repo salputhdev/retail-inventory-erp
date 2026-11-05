@@ -50,7 +50,7 @@
 | M6 — Hardening & Handover | 0/7 | 0/33 | — | ░░░░░░░░░░ 0% | ⬜ belum mulai |
 | **Total** | **0/73** | **0/356** | **—** | **░░░░░░░░░░ 0%** | |
 
-Status task: ⬜ 69 todo · 🔄 0 doing · 👀 4 review · ✅ 0 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 12/172  |  Isu terbuka: 3 (high: 0, menunggu pihak lain: 0)
+Status task: ⬜ 69 todo · 🔄 0 doing · 👀 4 review · ✅ 0 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 14/172  |  Isu terbuka: 3 (high: 0, menunggu pihak lain: 0)
 <!-- progress:end -->
 
 ---
@@ -91,7 +91,7 @@ Total: **73 task · 356 jam** (rentang PRD 310–400 jam). Detail tiap task: `do
 | -- | ---- | --- | ------ | -------- | ---------- | ------ | ------- | ------- |
 | T0.01 | Kickoff & validasi pertanyaan Fase 1 | 3 | — | 3/3 | NDA (C-01) | 👀 review | — | Simulasi portfolio: 10 jawaban = asumsi tertulis di `docs/milestones/M0-kickoff.md`; scope tidak berubah (PRD tetap v0.2); contoh file POS tidak ada, risiko dicatat (sintetis di T0.07) |
 | T0.02 | Kesepakatan target NFR & ADR awal | 4 | — | 3/3 | T0.01 | 👀 review | — | 28 NFR disepakati (6 dengan catatan, 0 angka diubah) di `docs/milestones/M0-nfr.md`; ADR-001..009 di `docs/adr/`; versi stack tercatat di ADR-009. Persetujuan = merge PR oleh Salman (architect simulasi) |
-| T0.03 | Repository di akun klien | 2 | — | 0/3 | Akun klien (C-03) | ⬜ todo | — | Prasyarat eksternal: akun/organisasi klien tersedia. |
+| T0.03 | Repository di akun klien | 2 | — | 2/3 | Akun klien (C-03) | ⬜ todo | — | Repo di organisasi salputhdev/retail-inventory-erp (simulasi akun klien). Proteksi `main` aktif: CI hijau (5 check) + 1 review, force-push dan hapus branch ditolak; admin boleh bypass (solo). Template PR (checklist DoD) + CODEOWNERS ditambahkan. Sisa: developer berstatus kolaborator di organisasi klien (tidak bisa disimulasikan solo) |
 | T0.04 | Kerangka project & environment lokal | 5 | — | 3/3 | T0.02, T0.03 | 👀 review | — | Dimulai atas perintah Salman sebelum T0.02/T0.03 (ISS-009). Bukti: `make setup` dari salinan bersih 3 mnt 4 dtk; `make test` hijau; modal lolos di browser tanpa pesan console |
 | T0.05 | Pipeline CI | 4 | — | 3/3 | T0.04 | 👀 review | — | Bukti: PR uji (#3, ditutup) membuat Pint/Larastan/Pest merah; `npm audit` keluar 1 untuk paket rentan (uji lokal di salinan); artefak `coverage` terunggah; durasi CI ±40 dtk (batas 10 mnt) |
 | T0.06 | Dokumen arsitektur & ERD v1 | 4 | — | 0/2 | T0.02 | ⬜ todo | — |  |
@@ -369,6 +369,7 @@ Satu baris per kejadian penting: task selesai, keputusan, perubahan scope, jawab
 | ------- | -------- | ------- |
 | 2026-11-06 | T0.02: 28 target NFR disepakati (tanpa perubahan angka), ADR-001..009 ditulis (ADR-006 usulan VPS, keputusan di T0.09) | T0.02, ADR-001..009 |
 | 2026-11-06 | T0.01 (simulasi): 10 pertanyaan validasi dijawab sebagai asumsi tertulis; ISS-001/002/003/004/006 ditutup; scope tidak berubah | T0.01 |
+| 2026-11-06 | Proteksi branch `main` di salputhdev/retail-inventory-erp: wajib 5 check CI + 1 review, branch harus up-to-date, force-push/hapus ditolak | T0.03, CD-01 |
 | 2026-11-06 | T0.05 terbukti: CI hijau di kode bersih (±40 dtk), merah untuk pelanggaran Pint/Larastan/test, coverage jadi artefak; naik ke `review`. Perbaikan di CI: tests/Unit ditambahkan, Vite dimatikan di test | T0.05 |
 | 2026-11-06 | Repo dipindah ke organisasi salputhdev/retail-inventory-erp; Actions berjalan (ISS-012 closed). CI pertama: Pest gagal karena folder tests/Unit tidak ada | T0.05, ISS-012 |
 | 2026-11-06 | T0.05: workflow CI ditulis; semua run GitHub Actions `startup_failure` (ISS-012), task `blocked` | T0.05, ISS-012 |
