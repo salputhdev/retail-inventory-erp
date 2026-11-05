@@ -41,16 +41,16 @@
 <!-- progress:start -->
 | Milestone | Task selesai | Jam selesai / estimasi | Jam aktual | Kemajuan (berbobot jam) | Status |
 | --------- | ------------ | ---------------------- | ---------- | ----------------------- | ------ |
-| M0 — Discovery & Architecture | 0/9 | 0/33 | — | ░░░░░░░░░░ 0% | 🔄 berjalan |
-| M1 — Foundation & Master Data | 0/14 | 0/66 | — | ░░░░░░░░░░ 0% | ⬜ belum mulai |
+| M0 — Discovery & Architecture | 9/9 | 33/33 | — | ▓▓▓▓▓▓▓▓▓▓ 100% | ✅ task selesai |
+| M1 — Foundation & Master Data | 0/14 | 0/66 | — | ░░░░░░░░░░ 0% | 🔄 berjalan |
 | M2 — Inventory Ledger | 0/12 | 0/64 | — | ░░░░░░░░░░ 0% | ⬜ belum mulai |
 | M3 — POS Integration | 0/12 | 0/57 | — | ░░░░░░░░░░ 0% | ⬜ belum mulai |
 | M4 — Stock Count & Reconciliation | 0/10 | 0/50 | — | ░░░░░░░░░░ 0% | ⬜ belum mulai |
 | M5 — Dashboard & Reports | 0/9 | 0/53 | — | ░░░░░░░░░░ 0% | ⬜ belum mulai |
 | M6 — Hardening & Handover | 0/7 | 0/33 | — | ░░░░░░░░░░ 0% | ⬜ belum mulai |
-| **Total** | **0/73** | **0/356** | **—** | **░░░░░░░░░░ 0%** | |
+| **Total** | **9/73** | **33/356** | **—** | **▓░░░░░░░░░ 9%** | |
 
-Status task: ⬜ 64 todo · 🔄 0 doing · 👀 9 review · ✅ 0 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 22/172  |  Isu terbuka: 4 (high: 0, menunggu pihak lain: 0)
+Status task: ⬜ 63 todo · 🔄 0 doing · 👀 1 review · ✅ 9 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 27/172  |  Isu terbuka: 4 (high: 0, menunggu pihak lain: 0)
 <!-- progress:end -->
 
 ---
@@ -63,7 +63,7 @@ Status task: ⬜ 64 todo · 🔄 0 doing · 👀 9 review · ✅ 0 done · ⛔ 0
 | ---- | --- |
 | Tanggal | 2026-11-06 |
 | Posisi | T0.04 `review`: kerangka Laravel 13 terbaru terverifikasi lokal dan di Docker (`make setup` dari salinan bersih 3 mnt 4 dtk, `make test`, modal di browser). Pest, Pint, Larastan, build Vite hijau. |
-| Berikutnya | Salman menandai task M0 `done` (atau menyuruh AI setelah konfirmasi). Lalu M1 dari `main`: T1.01 (Quantity & Money), T1.02, T1.03, satu PR per task. |
+| Berikutnya | Merge PR T1.01. Lalu T1.02 (lokasi & scope lokasi) dan T1.03 (autentikasi), dari `main`, satu PR per task. T1.04 (RBAC) bergantung T1.02. |
 | Perlu diingat | T0.04 dimulai sebelum T0.02/T0.03 (ISS-009), jadi `todo-summary --check` sengaja gagal sampai keduanya selesai. Versi terbaru belum disetujui architect (ADR-009). Di Mac ini `docker-credential-desktop` belum ada di PATH: tambahkan `/Applications/Docker.app/Contents/Resources/bin`. Test selalu lewat `make test` (DB `_test`). |
 | Menunggu klien | Vendor POS + contoh file (ISS-001), pilihan hosting (ISS-002), sumber data migrasi (ISS-003). |
 
@@ -74,7 +74,10 @@ Status task: ⬜ 64 todo · 🔄 0 doing · 👀 9 review · ✅ 0 done · ⛔ 0
 *Task `todo` yang semua dependensi task-nya sudah `done`. Dibuat otomatis.*
 
 <!-- ready:start -->
-_Tidak ada task yang siap (semua selesai atau terhalang dependensi)._
+- **T1.02** Lokasi & scope lokasi (5 jam)
+- **T1.03** Autentikasi (6 jam)
+- **T1.07** Fondasi audit log (5 jam)
+- **T6.04** Production, backup & monitoring (6 jam) · prasyarat eksternal: ADR-006
 <!-- ready:end -->
 
 ---
@@ -89,21 +92,21 @@ Total: **73 task · 356 jam** (rentang PRD 310–400 jam). Detail tiap task: `do
 
 | ID | Task | Est | Aktual | Kriteria | Bergantung | Status | Selesai | Catatan |
 | -- | ---- | --- | ------ | -------- | ---------- | ------ | ------- | ------- |
-| T0.01 | Kickoff & validasi pertanyaan Fase 1 | 3 | — | 3/3 | NDA (C-01) | 👀 review | — | Simulasi portfolio: 10 jawaban = asumsi tertulis di `docs/milestones/M0-kickoff.md`; scope tidak berubah (PRD tetap v0.2); contoh file POS tidak ada, risiko dicatat (sintetis di T0.07) |
-| T0.02 | Kesepakatan target NFR & ADR awal | 4 | — | 3/3 | T0.01 | 👀 review | — | 28 NFR disepakati (6 dengan catatan, 0 angka diubah) di `docs/milestones/M0-nfr.md`; ADR-001..009 di `docs/adr/`; versi stack tercatat di ADR-009. Persetujuan = merge PR oleh Salman (architect simulasi) |
-| T0.03 | Repository di akun klien | 2 | — | 3/3 | Akun klien (C-03) | 👀 review | — | Catatan resmi di `docs/milestones/M0.md` §4: kriteria 1 (kolaborator) N/A, deviasi D4 diterima Salman; kriteria 2 dan 3 terpenuhi (proteksi `main`, template PR) |
-| T0.04 | Kerangka project & environment lokal | 5 | — | 3/3 | T0.02, T0.03 | 👀 review | — | Dimulai atas perintah Salman sebelum T0.02/T0.03 (ISS-009). Bukti: `make setup` dari salinan bersih 3 mnt 4 dtk; `make test` hijau; modal lolos di browser tanpa pesan console |
-| T0.05 | Pipeline CI | 4 | — | 3/3 | T0.04 | 👀 review | — | Bukti: PR uji (#3, ditutup) membuat Pint/Larastan/Pest merah; `npm audit` keluar 1 untuk paket rentan (uji lokal di salinan); artefak `coverage` terunggah; durasi CI ±40 dtk (batas 10 mnt) |
-| T0.06 | Dokumen arsitektur & ERD v1 | 4 | — | 2/2 | T0.02 | 👀 review | — | ERD v1 di `docs/erd/` (50 tabel/view; 42 tabel PRD §6.1.6 tervalidasi otomatis + 4 framework + 4 tambahan yang diusulkan masuk PRD). Architecture naik ke v0.2 (diff header saja; butuh persetujuan). Tidak ada komentar architect (simulasi) |
-| T0.07 | Rencana sample data | 2 | — | 2/2 | T0.01 | 👀 review | — | `docs/sample-data-plan.md`: 2 profil (demo/load 10.000 SKU, 5.000 trx/hari), 11 skenario POS (6/6 jenis discrepancy), 14 skenario stock count, 14 skenario inventaris/katalog/keamanan. 2 hal terbuka (toleransi price_mismatch, SKU tak dihitung) |
-| T0.08 | Proposal budget & timeline | 3 | — | 2/2 | T0.01, T0.02 | 👀 review | — | `docs/proposal.md`: 356 jam = §10.1 (diverifikasi), kontingensi 12% (batas atas 399 jam), termin sebagai persentase. Tarif/nominal tidak dicantumkan (aturan repo, repo publik) |
-| T0.09 | Staging & deploy otomatis | 6 | — | 1/3 | T0.05, ADR-006 | 👀 review | — | Staging lokal prod-like (VPS dilewati, ADR-006). `make staging-deploy`: smoke test CD-05 lulus (13 OK, 2 SKIP). Kriteria 1 dan 2 disesuaikan (deviasi D1–D3 di M0.md, ISS-013); kriteria 3 (secret) terpenuhi |
+| T0.01 | Kickoff & validasi pertanyaan Fase 1 | 3 | — | 3/3 | NDA (C-01) | ✅ done | 2026-11-06 | Simulasi portfolio: 10 jawaban = asumsi tertulis di `docs/milestones/M0-kickoff.md`; scope tidak berubah (PRD tetap v0.2); contoh file POS tidak ada, risiko dicatat (sintetis di T0.07) |
+| T0.02 | Kesepakatan target NFR & ADR awal | 4 | — | 3/3 | T0.01 | ✅ done | 2026-11-06 | 28 NFR disepakati (6 dengan catatan, 0 angka diubah) di `docs/milestones/M0-nfr.md`; ADR-001..009 di `docs/adr/`; versi stack tercatat di ADR-009. Persetujuan = merge PR oleh Salman (architect simulasi) |
+| T0.03 | Repository di akun klien | 2 | — | 3/3 | Akun klien (C-03) | ✅ done | 2026-11-06 | Catatan resmi di `docs/milestones/M0.md` §4: kriteria 1 (kolaborator) N/A, deviasi D4 diterima Salman; kriteria 2 dan 3 terpenuhi (proteksi `main`, template PR). **Done atas konfirmasi Salman.** |
+| T0.04 | Kerangka project & environment lokal | 5 | — | 3/3 | T0.02, T0.03 | ✅ done | 2026-11-06 | Dimulai atas perintah Salman sebelum T0.02/T0.03 (ISS-009). Bukti: `make setup` dari salinan bersih 3 mnt 4 dtk; `make test` hijau; modal lolos di browser tanpa pesan console |
+| T0.05 | Pipeline CI | 4 | — | 3/3 | T0.04 | ✅ done | 2026-11-06 | Bukti: PR uji (#3, ditutup) membuat Pint/Larastan/Pest merah; `npm audit` keluar 1 untuk paket rentan (uji lokal di salinan); artefak `coverage` terunggah; durasi CI ±40 dtk (batas 10 mnt) |
+| T0.06 | Dokumen arsitektur & ERD v1 | 4 | — | 2/2 | T0.02 | ✅ done | 2026-11-06 | ERD v1 di `docs/erd/` (50 tabel/view; 42 tabel PRD §6.1.6 tervalidasi otomatis + 4 framework + 4 tambahan yang diusulkan masuk PRD). Architecture naik ke v0.2 (diff header saja; butuh persetujuan). Tidak ada komentar architect (simulasi) |
+| T0.07 | Rencana sample data | 2 | — | 2/2 | T0.01 | ✅ done | 2026-11-06 | `docs/sample-data-plan.md`: 2 profil (demo/load 10.000 SKU, 5.000 trx/hari), 11 skenario POS (6/6 jenis discrepancy), 14 skenario stock count, 14 skenario inventaris/katalog/keamanan. 2 hal terbuka (toleransi price_mismatch, SKU tak dihitung) |
+| T0.08 | Proposal budget & timeline | 3 | — | 2/2 | T0.01, T0.02 | ✅ done | 2026-11-06 | `docs/proposal.md`: 356 jam = §10.1 (diverifikasi), kontingensi 12% (batas atas 399 jam), termin sebagai persentase. Tarif/nominal tidak dicantumkan (aturan repo, repo publik) |
+| T0.09 | Staging & deploy otomatis | 6 | — | 3/3 | T0.05, ADR-006 | ✅ done | 2026-11-06 | Staging lokal prod-like (VPS dilewati, ADR-006). `make staging-deploy`: smoke test CD-05 lulus (13 OK, 2 SKIP). Kriteria 1 dan 2 disesuaikan (deviasi D1–D3 di M0.md, ISS-013); kriteria 3 (secret) terpenuhi. **Done atas konfirmasi Salman (sign-off M0): kriteria 1 dan 2 diterima dengan deviasi D2/D3 (docs/milestones/M0.md §3).** |
 
 ### M1 — Foundation & Master Data (minggu 2–3 · 14 task · 66 jam)
 
 | ID | Task | Est | Aktual | Kriteria | Bergantung | Status | Selesai | Catatan |
 | -- | ---- | --- | ------ | -------- | ---------- | ------ | ------- | ------- |
-| T1.01 | Value object Quantity & Money | 3 | — | 0/3 | T0.04 | ⬜ todo | — |  |
+| T1.01 | Value object Quantity & Money | 3 | — | 3/3 | T0.04 | 👀 review | — | `Support\Quantity` (3 desimal), `Money` (4 desimal), `QuantityCast`/`MoneyCast`. 58 test Pest hijau; `0.1+0.2` = `0.3`; Larastan menolak float (test pada fixture) dan menerima Quantity/string/int. Medium, R3 |
 | T1.02 | Lokasi & scope lokasi | 5 | — | 0/4 | T0.04 | ⬜ todo | — |  |
 | T1.03 | Autentikasi | 6 | — | 0/3 | T0.04 | ⬜ todo | — |  |
 | T1.04 | RBAC & segregasi tugas | 6 | — | 0/3 | T1.02 | ⬜ todo | — |  |
@@ -368,6 +371,8 @@ Satu baris per kejadian penting: task selesai, keputusan, perubahan scope, jawab
 
 | Tanggal | Kejadian | Terkait |
 | ------- | -------- | ------- |
+| 2026-11-06 | T0.01–T0.09 (M0) ditandai `done` atas konfirmasi Salman setelah sign-off gate M0 | M0 |
+| 2026-11-06 | T1.01: value object Quantity & Money + cast Eloquent; 3/3 kriteria dibuktikan lewat test (aritmetika, pembulatan, overflow numeric(14,x), float ditolak runtime dan statis) | T1.01, AR-06 |
 | 2026-11-06 | Gate M0: Salman menandatangani `docs/milestones/M0.md` (Disetujui; deviasi D1–D6 diterima). Status task M0 tetap `review` sampai Salman menandai `done` | M0 |
 | 2026-11-06 | T0.09 (staging lokal) terverifikasi: smoke test lulus, modal OK di HTTPS+CSP; T0.03 catatan resmi (deviasi D4); `docs/milestones/M0.md` siap sign-off | T0.09, T0.03, ISS-013 |
 | 2026-11-06 | T0.08: proposal budget & timeline (jam per milestone, termin %, asumsi, di luar scope) tanpa tarif | T0.08 |
