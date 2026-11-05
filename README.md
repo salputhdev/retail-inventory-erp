@@ -1,5 +1,8 @@
 # Retail Inventory Platform
 
+> **Proyek portfolio.** Repo ini dikerjakan seolah-olah untuk klien (ada PRD, arsitektur, task per milestone,
+> dan aturan kerja), tetapi tidak ada klien, NDA, atau data bisnis nyata di baliknya. Semua data adalah sampel.
+
 Laravel 13 · Livewire 4 · Alpine · Bootstrap 5.3 (Vite + Sass) · PostgreSQL 18 · Redis.
 Dokumen acuan ada di `docs/`; aturan kerja di `CLAUDE.md`, `WORKFLOW.md`, dan `MODEL-POLICY.md`.
 

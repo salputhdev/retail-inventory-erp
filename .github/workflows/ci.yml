@@ -1,0 +1,113 @@
+# Pipeline CI (Architecture §7.2, T0.05). Semua job harus hijau sebelum merge (CD-01).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PHP_VERSION: '8.5'
+  NODE_VERSION: '26'
+
+jobs:
+  lint:
+    name: Pint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: none
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - run: ./vendor/bin/pint --test
+
+  static:
+    name: Larastan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: none
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - run: ./vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+
+  test:
+    name: Pest + coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: retail_inventory_test
+          POSTGRES_USER: retail
+          POSTGRES_PASSWORD: secret
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U retail -d retail_inventory_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo_pgsql, intl, bcmath, pcntl
+          coverage: pcov
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - name: Siapkan environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate --no-interaction
+      - name: Pest (PostgreSQL asli)
+        run: ./vendor/bin/pest --coverage --coverage-clover=coverage/clover.xml --coverage-html=coverage/html
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  audit:
+    name: Audit dependensi
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: none
+      # Gagal hanya untuk severity high/critical (S-05).
+      - run: composer audit --locked --ignore-severity=low --ignore-severity=medium
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm audit --audit-level=high
+
+  build:
+    name: Build aset Vite
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run build
