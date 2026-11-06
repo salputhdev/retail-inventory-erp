@@ -69,4 +69,19 @@ final class LocationWriteGuard
             throw LocationNotAllowed::immutable();
         }
     }
+
+    /**
+     * Upsert harus memakai location_id sebagai bagian dari kunci konflik, supaya baris lokasi lain tidak ikut
+     * tertimpa. Indeks unik tabel transaksional wajib menyertakan location_id (ADR-003).
+     *
+     * @param  array<int|string, string>|string  $uniqueBy
+     */
+    public static function assertConflictKeyIncludesLocation(array|string $uniqueBy): void
+    {
+        $columns = is_array($uniqueBy) ? $uniqueBy : [$uniqueBy];
+
+        if (! in_array('location_id', $columns, true)) {
+            throw new LocationNotAllowed('upsert() wajib menyertakan location_id pada kunci konflik (uniqueBy); kunci tanpa location_id dapat menimpa baris lokasi lain.');
+        }
+    }
 }

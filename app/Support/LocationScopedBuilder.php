@@ -9,6 +9,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Collection;
 
 /**
  * Query builder untuk model BelongsToLocation: operasi tulis massal tidak memicu event model, jadi dijaga di sini (F4).
@@ -61,6 +62,8 @@ class LocationScopedBuilder extends Builder
     public function upsert(array $values, $uniqueBy, $update = null): int
     {
         LocationWriteGuard::assertRows($values);
+        // Kunci konflik tanpa location_id membuat ON CONFLICT DO UPDATE menimpa baris lokasi LAIN (S1).
+        LocationWriteGuard::assertConflictKeyIncludesLocation($uniqueBy);
         LocationWriteGuard::assertNotChangingLocation($update ?? array_keys(is_array($values[0] ?? null) ? $values[0] : $values));
 
         return parent::upsert($values, $uniqueBy, $update);
@@ -72,6 +75,64 @@ class LocationScopedBuilder extends Builder
         LocationWriteGuard::assertNotChangingLocation($values);
 
         return parent::update($values);
+    }
+
+    /**
+     * @param  array<int|string, mixed>  $values
+     * @param  array<int, string>  $returning
+     * @param  array<int|string, string>|string|null  $uniqueBy
+     * @return Collection<int, \stdClass>
+     */
+    public function insertOrIgnoreReturning(array $values, array $returning = ['*'], array|string|null $uniqueBy = null)
+    {
+        LocationWriteGuard::assertRows($values);
+
+        return $this->query->insertOrIgnoreReturning($values, $returning, $uniqueBy);
+    }
+
+    /**
+     * @param  array<int|string, mixed>  $columns
+     * @param  Closure|QueryBuilder|Builder<*>|string  $query
+     */
+    public function insertOrIgnoreUsing(array $columns, Closure|QueryBuilder|Builder|string $query): int
+    {
+        // Sama seperti insertUsing: baris berasal dari subquery, location_id tidak bisa diperiksa per baris.
+        throw new LocationNotAllowed('insertOrIgnoreUsing() tidak didukung pada model ber-scope lokasi; pakai insertOrIgnore() dengan location_id eksplisit.');
+    }
+
+    /**
+     * Tanpa override ini updateFrom() diteruskan ke query mentah dan MELEWATI global scope (S3).
+     *
+     * @param  array<string, mixed>  $values
+     */
+    public function updateFrom(array $values): int
+    {
+        LocationWriteGuard::assertNotChangingLocation($values);
+
+        return $this->toBase()->updateFrom($values); // toBase() menerapkan LocationScope
+    }
+
+    /** truncate() menghapus semua baris lintas lokasi dan melewati scope (S3). */
+    public function truncate(): void
+    {
+        throw new LocationNotAllowed('truncate() tidak diizinkan pada model ber-scope lokasi (menghapus data semua lokasi).');
+    }
+
+    /**
+     * Deny-by-default: metode tulis yang belum dijaga eksplisit di kelas ini TIDAK diteruskan ke query mentah
+     * (yang melewati global scope). Mencegah metode tulis baru dari Laravel bocor diam-diam. Lihat
+     * LocationScopedBuilderCoverageTest yang gagal bila ada metode tulis Query\Builder yang belum tercakup.
+     *
+     * @param  string  $method
+     * @param  array<int|string, mixed>  $parameters
+     */
+    public function __call($method, $parameters): mixed
+    {
+        if (preg_match('/^(insert|update|upsert|delete|truncate|increment|decrement)/i', $method) === 1 && ! static::hasGlobalMacro($method) && ! $this->hasMacro($method) && ! $this->model->hasNamedScope($method)) {
+            throw new LocationNotAllowed("Metode tulis {$method}() belum dijaga untuk model ber-scope lokasi; tambahkan override di LocationScopedBuilder.");
+        }
+
+        return parent::__call($method, $parameters);
     }
 
     /**

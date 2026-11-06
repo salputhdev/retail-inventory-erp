@@ -121,7 +121,7 @@ it('F4: insert/insertOrIgnore/upsert massal ke lokasi lain atau tanpa location_i
         ->toThrow(LocationNotAllowed::class);
     expect(fn () => SampleLocatedLine::query()->upsert([['id' => $d['lineA']->id, 'name' => 'z', 'location_id' => $d['b']->id]], ['id'], ['name']))
         ->toThrow(LocationNotAllowed::class);
-    expect(fn () => SampleLocatedLine::query()->upsert([['id' => $d['lineA']->id, 'name' => 'z', 'location_id' => $d['a']->id]], ['id'], ['location_id']))
+    expect(fn () => SampleLocatedLine::query()->upsert([['id' => $d['lineA']->id, 'name' => 'z', 'location_id' => $d['a']->id]], ['location_id', 'id'], ['location_id']))
         ->toThrow(LocationNotAllowed::class, 'tidak boleh diubah');
     expect(fn () => SampleLocatedLine::query()->insertUsing(['name', 'location_id'], DB::table('sample_located_lines')->select(['name', 'location_id'])))
         ->toThrow(LocationNotAllowed::class);

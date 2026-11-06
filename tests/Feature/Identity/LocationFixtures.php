@@ -41,6 +41,8 @@ final class LocationFixtures
             $table->timestampTz('occurred_at')->nullable();
             $table->timestampsTz();
         });
+        // Indeks unik wajib menyertakan location_id agar upsert aman (S1, ADR-003).
+        Schema::table('sample_located_lines', fn (Blueprint $t) => $t->unique(['location_id', 'name']));
         LocationGuard::attach('sample_located_lines'); // lapis terakhir di database (F4)
     }
 
