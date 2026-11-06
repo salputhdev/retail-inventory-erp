@@ -8,7 +8,7 @@ use App\Domain\Identity\Models\Location;
 use App\Domain\Identity\Policies\LocationPolicy;
 use App\Domain\Identity\Policies\PermissionGate;
 use App\Support\Audit\AuditTrail;
-use App\Support\Audit\LogAuditTrail;
+use App\Support\Audit\DatabaseAuditTrail;
 use App\Support\Auth\PasswordRule;
 use App\Support\LocationContext;
 use Illuminate\Auth\Events\Login;
@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // scoped: di-reset setiap request dan setiap job queue, jadi konteks lokasi tidak bocor antar eksekusi.
         $this->app->scoped(LocationContext::class);
-        $this->app->singleton(AuditTrail::class, LogAuditTrail::class);
+        $this->app->singleton(AuditTrail::class, DatabaseAuditTrail::class);
     }
 
     /**

@@ -8,6 +8,7 @@ use App\Domain\Identity\Models\Location;
 use App\Support\Audit\AuditTrail;
 use App\Support\Authorization\Actor;
 use Carbon\CarbonInterface;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 /**
@@ -24,13 +25,17 @@ final class SetLocationCutover
         Gate::forUser($actor)->authorize('setCutover', $location);
 
         $before = $location->cutover_at?->toIso8601String();
-        $location->forceFill(['cutover_at' => $cutoverAt->clone()->utc()])->save();
 
-        $this->audit->record('location.cutover_changed', [
-            'location_id' => $location->id,
-            'before' => $before,
-            'after' => $location->cutover_at?->toIso8601String(),
-        ], $actor->id);
+        // Perubahan dan audit dalam satu transaksi (ISS-027): bila salah satu gagal, tidak ada yang tersimpan.
+        DB::transaction(function () use ($location, $cutoverAt, $before, $actor) {
+            $location->forceFill(['cutover_at' => $cutoverAt->clone()->utc()])->save();
+
+            $this->audit->record('location.cutover_changed', [
+                'location_id' => $location->id,
+                'before' => $before,
+                'after' => $location->cutover_at?->toIso8601String(),
+            ], $actor->id, $location);
+        });
 
         return $location;
     }

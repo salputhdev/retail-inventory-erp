@@ -12,6 +12,7 @@ use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 /**
@@ -32,19 +33,19 @@ final class AuditAuthEvents
 
     public function login(Login $event): void
     {
-        $this->audit()->record('auth.login', [], $this->id($event->user));
+        $this->audit()->record('auth.login', [], $this->id($event->user), $this->subject($event->user));
     }
 
     public function logout(Logout $event): void
     {
-        $this->audit()->record('auth.logout', [], $this->id($event->user));
+        $this->audit()->record('auth.logout', [], $this->id($event->user), $this->subject($event->user));
     }
 
     public function failed(Failed $event): void
     {
         $this->audit()->record('auth.login_failed', [
             'email' => $this->email($event->credentials['email'] ?? null),
-        ]);
+        ], subject: $this->subject($event->user));
     }
 
     public function lockout(Lockout $event): void
@@ -56,15 +57,15 @@ final class AuditAuthEvents
 
     public function passwordReset(PasswordReset $event): void
     {
-        $this->audit()->record('auth.password_reset', [], $this->id($event->user));
+        $this->audit()->record('auth.password_reset', [], $this->id($event->user), $this->subject($event->user));
     }
 
     public function verified(Verified $event): void
     {
-        $this->audit()->record('auth.email_verified', [], $this->id($event->user));
+        $this->audit()->record('auth.email_verified', [], $this->id($event->user), $this->subject($event->user));
     }
 
-    /** Lazy: AuditTrail bisa diganti (mis. T1.07, atau fake di test) setelah subscriber terdaftar. */
+    /** Lazy: AuditTrail bisa diganti (mis. fake di test) setelah subscriber terdaftar. */
     private function audit(): AuditTrail
     {
         return app(AuditTrail::class);
@@ -75,8 +76,23 @@ final class AuditAuthEvents
         return is_object($user) && method_exists($user, 'getAuthIdentifier') ? (int) $user->getAuthIdentifier() : null;
     }
 
+    private function subject(mixed $user): ?Model
+    {
+        return $user instanceof Model ? $user : null;
+    }
+
+    /**
+     * ISS-022: hanya mencatat nilai yang benar-benar berformat email. Password yang salah diketik di kolom email
+     * tidak boleh tersimpan 365 hari di audit.
+     */
     private function email(mixed $value): ?string
     {
-        return is_string($value) ? Str::limit(Str::lower(trim($value)), 190, '') : null;
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $normalized = Str::limit(Str::lower(trim($value)), 190, '');
+
+        return filter_var($normalized, FILTER_VALIDATE_EMAIL) !== false ? $normalized : '[bukan-email]';
     }
 }
