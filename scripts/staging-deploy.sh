@@ -29,6 +29,8 @@ for i in $(seq 1 20); do
   sleep 3
 done
 [ "$migrated" = 1 ] || { echo "GAGAL: migrasi tidak berhasil setelah 20 percobaan"; exit 1; }
+echo "==> Seed RBAC (role/izin; aman diulang, tidak menimpa penyesuaian role, ISS-025)"
+$C exec -T app php artisan db:seed --class=RbacSeeder --force
 echo "==> Cache konfigurasi"
 $C exec -T app php artisan config:cache
 $C exec -T app php artisan route:cache

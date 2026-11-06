@@ -50,6 +50,17 @@ Hal-hal yang sudah memakan waktu di M0–T1.02 dan jangan diulang. Tambahkan bar
 - `Hash::partialMock()` tidak punya container: `Hash::make()` asli rusak di dalamnya. Hangatkan hal yang butuh `make` sebelum mock. Hasher bcrypt membaca ronde saat dibuat: ubah lewat `Hash::driver('bcrypt')->setRounds()`, bukan hanya `config()`.
 - Mutan yang selamat karena lapis lain menutupinya (mis. `TrimStrings`): uji komponen langsung (limiter dengan `Request::create`), jangan hanya lewat HTTP.
 
+## Otorisasi (T1.04)
+- `Gate::before` bawaan spatie mengizinkan `can('izin', $model)` tanpa memanggil Policy, jadi cek lokasi terlewati. Dimatikan (`register_permission_check_method => false`); penggantinya `PermissionGate` menolak izin yang diberi argumen.
+- `Gate::before` berupa objek invokable gagal untuk guest (Gate memakai `ReflectionFunction`): daftarkan sebagai Closure, `(new PermissionGate)(...)`.
+- Worker queue menyimpan izin spatie di memori sampai restart: kosongkan di `JobProcessing`. Spatie juga membuang cache di dalam transaksi; buang lagi setelah commit agar request lain tidak menyimpan data lama.
+- `Permission::findOrCreate` memuat ulang seluruh tabel izin setiap kali cache dibuang: seeder 37 izin jadi O(n²) (matriks 185 test: 44 dtk → 10 dtk setelah diganti query biasa).
+- `Role::findByName()` bertipe kontrak spatie (Larastan menolak dipakai sebagai model): pakai `Role::query()->where('name', ...)->firstOrFail()`.
+- `Response::deny()` tanpa kode punya `status()` null (dirender 403); `denyAsNotFound()` = 404.
+- Laravel menemukan `Domain\X\Policies\YPolicy` otomatis untuk `Domain\X\Models\Y`; registrasi eksplisit tetap dipasang, dan uji mutasinya perlu mematikan auto-discovery (`Gate::guessPolicyNamesUsing`).
+- Closure di dalam baris dataset Pest tidak dievaluasi; jangan membuat model di dataset (model ter-boot sebelum aplikasi siap).
+- Lokal tanpa Docker: `artisan db:seed` butuh `CACHE_STORE=array` (PHP host tidak punya ekstensi redis).
+
 ## Cara menguji pengaman (uji mutasi)
 - Rusak pengaman satu per satu, pastikan test gagal, lalu pulihkan. **Pakai skrip `bash` dengan cadangan nyata dan `cmp`**: di zsh `$FILES` tidak dipecah per kata, cadangan gagal diam-diam, dan mutasi menumpuk di file produksi (terjadi sekali; dipulihkan manual).
 - File yang belum ter-track git tidak bisa dipulihkan dengan `git checkout`.
