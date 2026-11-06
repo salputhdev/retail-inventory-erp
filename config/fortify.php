@@ -101,7 +101,8 @@ return [
     |
     */
 
-    'middleware' => ['web'],
+    // throttle:fortify-post = batas POST per IP (lihat FortifyServiceProvider).
+    'middleware' => ['web', 'throttle:fortify-post'],
 
     /*
     |--------------------------------------------------------------------------

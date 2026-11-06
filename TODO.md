@@ -50,7 +50,7 @@
 | M6 — Hardening & Handover | 0/7 | 0/33 | — | ░░░░░░░░░░ 0% | ⬜ belum mulai |
 | **Total** | **9/73** | **33/356** | **—** | **▓░░░░░░░░░ 9%** | |
 
-Status task: ⬜ 61 todo · 🔄 0 doing · 👀 3 review · ✅ 9 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 34/172  |  Isu terbuka: 11 (high: 0, menunggu pihak lain: 0)
+Status task: ⬜ 61 todo · 🔄 0 doing · 👀 3 review · ✅ 9 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 34/172  |  Isu terbuka: 15 (high: 0, menunggu pihak lain: 0)
 <!-- progress:end -->
 
 ---
@@ -62,7 +62,7 @@ Status task: ⬜ 61 todo · 🔄 0 doing · 👀 3 review · ✅ 9 done · ⛔ 0
 | Item | Isi |
 | ---- | --- |
 | Tanggal | 2026-11-06 |
-| Posisi | **M0 selesai**. 9/73 task `done`. T1.01 dan T1.02 ter-merge (`review`). **T1.03 `review`: PR terbuka**, 193 test hijau, uji mutasi 24/24, menunggu `/review-security` (R4) dan merge oleh Salman. |
+| Posisi | **M0 selesai**. 9/73 task `done`. T1.01 dan T1.02 ter-merge (`review`). **T1.03 `review`: PR terbuka**, 208 test hijau, uji mutasi 24/24 + 16/16 review, menunggu `/review-security` (R4) dan merge oleh Salman. |
 | Berikutnya | 1) `/review-security main` pada PR T1.03, perbaiki temuan, merge. 2) **T1.04 RBAC & segregasi tugas** (bergantung T1.02; menutup ISS-014 Policy `Location`, ISS-017). T1.05 (2FA wajib, mempertahankan aturan ADR-013), T1.07 (audit persisten, ISS-019), T1.08 (admin user, ISS-018/020). Satu PR per task dari `main`. |
 | Perlu diingat | Baca **`docs/LESSONS.md`** dulu (jebakan yang sudah memakan waktu). Test lokal: `DB_USERNAME=salman DB_PASSWORD= ./vendor/bin/pest`; Docker butuh `/Applications/Docker.app/Contents/Resources/bin` di PATH. Repo aktif: `salputhdev/retail-inventory-erp`. Proyek ini **portfolio** (tanpa klien nyata); hindari seremoni berlebih tapi ikuti `WORKFLOW.md`. |
 | Isu terbuka | ISS-014 Policy `Location` (T1.04) · ISS-015 insert mentah (T2.01) · ISS-016 S4 insert massal (sebelum endpoint) · ISS-017 S5 pelaku cutover (T1.04/T1.07) · ISS-018 **pertanyaan untuk Salman**: lokasi nonaktif read-only atau diblokir? · ISS-013 deviasi staging lokal · ISS-009 versi terbaru belum disetujui architect · ISS-005, ISS-007 (rendah) |
@@ -107,7 +107,7 @@ Total: **73 task · 356 jam** (rentang PRD 310–400 jam). Detail tiap task: `do
 | -- | ---- | --- | ------ | -------- | ---------- | ------ | ------- | ------- |
 | T1.01 | Value object Quantity & Money | 3 | — | 3/3 | T0.04 | 👀 review | — | `Support\Quantity` (3 desimal), `Money` (4 desimal), `QuantityCast`/`MoneyCast`. 58 test Pest hijau; `0.1+0.2` = `0.3`; Larastan menolak float (test pada fixture) dan menerima Quantity/string/int. Medium, R3 |
 | T1.02 | Lokasi & scope lokasi | 5 | — | 4/4 | T0.04 | 👀 review | — | `locations`, `location_user`, `LocationScope` (gagal tertutup), `BelongsToLocation`, `LocationContext` (job/command eksplisit), waktu UTC↔zona lokasi. 138 test hijau; review keamanan #1 (F1–F5) dan #2 (S1–S3) ditutup (ADR-003); S4/S5 dicatat ISS-016/017; uji mutasi + rollback migrasi + trigger DB teruji. R4: menunggu verifikasi ulang `/review-security` oleh Salman |
-| T1.03 | Autentikasi | 6 | — | 3/3 | T0.04 | 👀 review | — | Fortify (login, logout, reset, verifikasi email; registrasi mati), password ≥12 + cek bocor, 5 gagal/15 mnt (+20/IP), idle 30 mnt + absolut 12 jam, user nonaktif/password diganti = sesi dicabut. 193 test; uji mutasi 24/24 terdeteksi. **Audit via kontrak `AuditTrail` (log), persisten di T1.07 (ISS-019).** R4: menunggu `/review-security` oleh Salman |
+| T1.03 | Autentikasi | 6 | — | 3/3 | T0.04 | 👀 review | — | Fortify (login, logout, reset, verifikasi email; registrasi mati), password ≥12 + cek bocor, 5 gagal/15 mnt (+20/IP), idle 30 mnt + absolut 12 jam, user nonaktif/password diganti = sesi dicabut. 208 test; uji mutasi 24/24, dan 16/16 untuk perbaikan review keamanan (F1–F4). **Audit via kontrak `AuditTrail` (log), persisten di T1.07 (ISS-019).** R4: menunggu `/review-security` oleh Salman |
 | T1.04 | RBAC & segregasi tugas | 6 | — | 0/3 | T1.02 | ⬜ todo | — |  |
 | T1.05 | 2FA wajib | 4 | — | 0/2 | T1.03, T1.04 | ⬜ todo | — |  |
 | T1.06 | Shell UI & komponen Bootstrap | 6 | — | 0/3 | T0.04, T1.04 | ⬜ todo | — |  |
@@ -307,6 +307,10 @@ ID berurutan (ISS-001, ISS-002, …), tidak dipakai ulang. Isu yang selesai diub
 | ISS-018 | question | User di lokasi yang dinonaktifkan: `locationIds()` tidak memfilter `is_active`, jadi user tetap bisa baca/tulis | med | open | T1.08, PRD | Salman | 2026-11-06 | — | Temuan review keamanan #2 (§4). Keputusan produk: lokasi nonaktif = read-only atau terblokir penuh? Tetapkan di PRD sebelum T1.08 |
 | ISS-019 | change | Kriteria T1.03 "tercatat di audit log" dipenuhi lewat kontrak `AuditTrail` + channel log `audit`; tabel audit yang tidak bisa diubah aplikasi belum ada | med | open | T1.07, T1.03 | Developer | 2026-11-06 | — | T1.07 mengganti `LogAuditTrail` dengan penyimpanan database (activitylog) tanpa mengubah pemanggil (ADR-013); audit L-01 baru penuh setelah itu |
 | ISS-020 | debt | Email user belum dijamin huruf kecil di database (unik case-sensitive di PostgreSQL); pencarian login sudah tidak peka huruf | low | open | T1.08 | Developer | 2026-11-06 | — | Saat membuat/ubah user (T1.08): simpan huruf kecil + indeks unik `lower(email)` |
+| ISS-021 | risk | F5 (review T1.03): email reset password dikirim sinkron untuk email terdaftar sedangkan email tak dikenal langsung kembali, selisih waktu bisa dipakai enumerasi | low | open | T1.05, T1.07 | Developer | 2026-11-06 | — | Status *suspected* (perlu ukur dengan mailer produksi). Kirim notifikasi lewat queue (`ShouldQueue`) saat Horizon ada |
+| ISS-022 | bug | F6: email login yang bukan format email dicatat apa adanya di audit; password yang salah ketik di kolom email tersimpan 365 hari | low | open | T1.07 | Developer | 2026-11-06 | — | Catat email hanya bila lolos `FILTER_VALIDATE_EMAIL`, selain itu `[bukan-email]`. Selesaikan bersama audit persisten |
+| ISS-023 | risk | F7: pembanding `password_changed_at > login_at` berpresisi detik, dan hanya `ResetUserPassword` yang mengisi `password_changed_at` | low | open | T1.08 | Developer | 2026-11-06 | — | Pakai sidik jari hash password di sesi (pola `AuthenticateSession`) atau presisi mikrodetik; semua jalur ganti password (T1.08) wajib mengisinya |
+| ISS-024 | risk | F8: batas 20 gagal per IP berlaku untuk semua user di balik IP yang sama (NAT toko), dan `trustProxies` belum dikonfigurasi | low | open | T6.04 | Developer | 2026-11-06 | — | Konfigurasi `trustProxies` (hanya IP proxy yang dikenal) saat topologi produksi diketahui; pertimbangkan batas per IP lebih tinggi |
 | ISS-010 | debt | Docker lokal dan modal Bootstrap di browser belum diuji | med | closed | T0.04 | Developer | 2026-11-06 | 2026-11-06 | `make setup` dari salinan bersih berhasil; modal buka/tutup lolos sebelum dan sesudah re-render Livewire, console bersih. Temuan yang diperbaiki: PECL redis gagal di PHP 8.5, `artisan serve` membuang env Compose, port 5432 bentrok, test sempat menyentuh DB dev (kini dijaga `TestCase` + `make test`) |
 | ISS-011 | risk | Repo di akun GitHub pribadi (salputh/retail-inventory-platform), bukan organisasi klien | low | closed | T0.03, C-03 | Developer | 2026-11-06 | 2026-11-06 | Ditutup: ini proyek portfolio tanpa klien nyata; repo dipublikasikan setelah dipindai (tanpa secret/data klien). T0.03 tetap `todo` sebagai simulasi proses |
 | ISS-012 | bug | GitHub Actions tidak bisa berjalan di akun salputh: billing akun terkunci | high | closed | T0.05 | Salman | 2026-11-06 | 2026-11-06 | Diselesaikan dengan memindahkan repo ke organisasi salputhdev (billing terpisah): Actions berjalan. Repo kini salputhdev/retail-inventory-erp |
@@ -377,6 +381,7 @@ Satu baris per kejadian penting: task selesai, keputusan, perubahan scope, jawab
 
 | Tanggal | Kejadian | Terkait |
 | ------- | -------- | ------- |
+| 2026-11-06 | T1.03: review keamanan PR #15 menemukan F1–F4 (medium); semuanya ditutup (respons lupa-password identik termasuk JSON, hash palsu di-cache, batas login per akun, batas confirm-password) + batas POST umum; 16 mutan terdeteksi; F5–F8 dicatat ISS-021..024. Keputusan untuk Salman: kunci per akun memungkinkan DoS akun (ADR-013) | T1.03, ADR-013 |
 | 2026-11-06 | T1.03: autentikasi Fortify selesai (review): 193 test, uji mutasi 24/24; ADR-013; ISS-019 (audit persisten di T1.07) dan ISS-020 (email huruf kecil di T1.08) dicatat | T1.03, ADR-013 |
 | 2026-11-06 | T1.02: review keamanan kedua (PR #14) menemukan S1–S3 (bypass builder: upsert, insertOrIgnoreReturning/Using, updateFrom, truncate); ditutup + deny-by-default + penjaga metode baru Laravel; S4, S5, dan lokasi nonaktif dicatat sebagai ISS-016/017/018 | T1.02, ADR-003 |
 | 2026-11-06 | T1.02: review keamanan (R4) menemukan 5 celah laten (F1–F5); semuanya ditutup dengan test + uji mutasi (10 mutan: 9 terdeteksi, 1 selamat karena pertahanan berlapis, terbukti terdeteksi saat kedua lapis dimatikan); ISS-014/015 dicatat | T1.02, ADR-003 |

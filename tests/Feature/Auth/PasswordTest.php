@@ -135,6 +135,31 @@ it('"lupa password" tidak membocorkan apakah email terdaftar', function () {
     Notification::assertNothingSentTo(User::factory()->make(['email' => 'hantu@example.test']));
 });
 
+it('F1: "lupa password" lewat JSON juga tidak membocorkan email terdaftar (status dan isi sama)', function () {
+    Notification::fake();
+    $user = AuthHelpers::user();
+
+    $known = (new Browser('203.0.113.43'))->postJson('/forgot-password', ['email' => $user->email]);
+    $unknown = (new Browser('203.0.113.44'))->postJson('/forgot-password', ['email' => 'hantu@example.test']);
+
+    expect($unknown->getStatusCode())->toBe($known->getStatusCode())->toBe(200);
+    expect($unknown->getContent())->toBe($known->getContent());
+    expect($known->json('message'))->toBe(__('passwords.sent'));
+    Notification::assertSentToTimes($user, ResetPassword::class, 1);
+});
+
+it('F1: respons HTML dan JSON "lupa password" konsisten antara email dikenal dan tidak dikenal untuk SEMUA bentuk', function (string $kind) {
+    Notification::fake();
+    $user = AuthHelpers::user();
+    $send = fn (Browser $b, string $email) => $kind === 'json' ? $b->postJson('/forgot-password', ['email' => $email]) : $b->post('/forgot-password', ['email' => $email]);
+
+    $known = $send(new Browser('203.0.113.45'), $user->email);
+    $unknown = $send(new Browser('203.0.113.46'), 'hantu@example.test');
+
+    expect($unknown->getStatusCode())->toBe($known->getStatusCode());
+    expect($unknown->headers->get('Content-Type'))->toBe($known->headers->get('Content-Type'));
+})->with(['html', 'json']);
+
 it('permintaan reset berulang dalam jendela throttle tidak mengubah respons (tidak membocorkan)', function () {
     Notification::fake();
     $user = AuthHelpers::user();

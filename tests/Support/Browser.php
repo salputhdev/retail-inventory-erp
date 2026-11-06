@@ -41,6 +41,15 @@ final class Browser
         return $this->send('post', $uri, $data);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return TestResponse<Response>
+     */
+    public function postJson(string $uri, array $data = []): TestResponse
+    {
+        return $this->send('postJson', $uri, $data);
+    }
+
     /** @return TestResponse<Response> */
     public function get(string $uri): TestResponse
     {
@@ -91,7 +100,11 @@ final class Browser
 
         // withCredentials(): request JSON hanya mengirim cookie bila ini aktif (seperti fetch dengan credentials).
         $call = $this->test->withCredentials()->withServerVariables(['REMOTE_ADDR' => $this->ip]);
-        $response = $method === 'post' ? $call->post($uri, $data) : $call->{$method}($uri);
+        $response = match ($method) {
+            'post' => $call->post($uri, $data),
+            'postJson' => $call->postJson($uri, $data),
+            default => $call->{$method}($uri),
+        };
 
         foreach ($response->baseResponse->headers->getCookies() as $cookie) {
             if ($cookie->isCleared() || $cookie->getValue() === '' || $cookie->getValue() === null) {

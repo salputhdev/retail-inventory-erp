@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use App\Domain\Identity\Models\User;
+use App\Support\Auth\DummyHash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Tests\Support\AuthHelpers;
 use Tests\Support\Browser;
@@ -58,6 +60,7 @@ it('user nonaktif tidak bisa login walau password benar, dan tidak ada sesi terb
 
 it('selalu mencocokkan hash BCRYPT sungguhan walau email tidak terdaftar (waktu respons sama)', function () {
     $real = AuthHelpers::user();
+    DummyHash::value(); // hangatkan cache sebelum mock (Hash::partialMock() tidak punya container, jadi make() asli tidak bisa jalan di dalamnya)
     $checkedHashes = [];
     Hash::partialMock()->shouldReceive('check')->andReturnUsing(function ($value, $hashed) use (&$checkedHashes) {
         $checkedHashes[] = $hashed;
@@ -74,6 +77,39 @@ it('selalu mencocokkan hash BCRYPT sungguhan walau email tidak terdaftar (waktu 
         expect(password_get_info($hash)['algoName'])->toBe('bcrypt');
         expect(password_get_info($hash)['options']['cost'])->toBe(password_get_info($real->password)['options']['cost']);
     }
+});
+
+it('F2: hash palsu dibuat sekali lalu dipakai ulang, tidak dihitung per request (Hash::make tidak dipanggil di jalur login)', function () {
+    AuthHelpers::user();
+    $warm = DummyHash::value(); // hangatkan cache seperti request pertama setelah deploy
+    expect(DummyHash::value())->toBe($warm);
+
+    $makes = 0;
+    Hash::partialMock()->shouldReceive('make')->andReturnUsing(function () use (&$makes) {
+        $makes++;
+
+        return 'tidak-dipakai';
+    });
+
+    (new Browser)->post('/login', ['email' => 'hantu@example.test', 'password' => 'apa-saja-123456']);
+
+    expect($makes)->toBe(0); // bcrypt kedua pada jalur email tak dikenal = selisih waktu yang bisa diukur
+});
+
+it('F2: hash palsu mengikuti jumlah ronde bcrypt dan dibuat ulang bila berubah', function () {
+    // Hasher bcrypt membaca jumlah ronde saat dibuat: ubah config DAN hasher agar menyerupai perubahan BCRYPT_ROUNDS + deploy.
+    config(['hashing.bcrypt.rounds' => 4]);
+    Hash::driver('bcrypt')->setRounds(4);
+    Cache::flush();
+    $low = DummyHash::value();
+
+    config(['hashing.bcrypt.rounds' => 6]);
+    Hash::driver('bcrypt')->setRounds(6);
+    $high = DummyHash::value();
+
+    expect(password_get_info($low)['options']['cost'])->toBe(4);
+    expect(password_get_info($high)['options']['cost'])->toBe(6);
+    expect($high)->not->toBe($low);
 });
 
 it('email berhuruf campuran di database tetap bisa login dengan input huruf kecil', function () {

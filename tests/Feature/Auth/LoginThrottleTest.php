@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Illuminate\Http\Request;
+use Laravel\Fortify\LoginRateLimiter;
 use Tests\Support\AuthHelpers;
 use Tests\Support\Browser;
 use Tests\Support\Clock;
@@ -77,12 +79,49 @@ it('email dihitung tanpa membedakan huruf besar/kecil', function () {
     $browser->get('/dashboard')->assertRedirect('/login');
 });
 
-it('menyerang satu akun dari IP lain tidak mengunci pemilik akun (bucket email+IP)', function () {
+it('F3: 5 kegagalan dari IP BERBEDA tetap mengunci akun (batas per akun, bukan email+IP)', function () {
+    $audit = AuthHelpers::fakeAudit();
     $user = AuthHelpers::user();
-    failLogin(new Browser('198.51.100.7'), $user->email, 6); // penyerang
 
+    // Botnet: satu tebakan per IP. Dengan batas email+IP, tebakan seperti ini tidak pernah terkunci.
+    foreach (['198.51.100.1', '198.51.100.2', '198.51.100.3', '198.51.100.4', '198.51.100.5'] as $ip) {
+        (new Browser($ip))->post('/login', ['email' => $user->email, 'password' => 'tebakan-botnet']);
+    }
+
+    // IP baru dan password yang BENAR: akun tetap terkunci.
     $owner = new Browser('203.0.113.99');
-    $owner->login($user->email, AuthHelpers::PASSWORD)->assertRedirect('/dashboard');
+    $owner->post('/login', ['email' => $user->email, 'password' => AuthHelpers::PASSWORD])->assertSessionHasErrors('email');
+    $owner->get('/dashboard')->assertRedirect('/login');
+    expect($audit->count('auth.lockout'))->toBe(1);
+});
+
+it('kunci akun berakhir setelah 15 menit dan tidak memengaruhi akun lain', function () {
+    $victim = AuthHelpers::user();
+    $other = AuthHelpers::user();
+    $start = now();
+
+    foreach (range(1, 5) as $i) {
+        (new Browser("198.51.100.{$i}"))->post('/login', ['email' => $victim->email, 'password' => 'tebakan-botnet']);
+    }
+
+    (new Browser('203.0.113.70'))->login($other->email, AuthHelpers::PASSWORD)->assertRedirect('/dashboard'); // akun lain bebas
+
+    $owner = new Browser('203.0.113.71');
+    $owner->post('/login', ['email' => $victim->email, 'password' => AuthHelpers::PASSWORD])->assertSessionHasErrors('email');
+
+    Clock::at($start->copy()->addMinutes(15)->addSeconds(5));
+    $owner->login($victim->email, AuthHelpers::PASSWORD)->assertRedirect('/dashboard');
+});
+
+it('hitungan akun tidak bisa dihindari dengan variasi huruf atau spasi pada email', function () {
+    $user = AuthHelpers::user(['email' => 'dewi@example.test']);
+
+    foreach (['dewi@example.test', 'DEWI@example.test', ' dewi@example.test ', 'Dewi@Example.Test', 'dEwI@example.test'] as $i => $variant) {
+        (new Browser('198.51.100.'.(10 + $i)))->post('/login', ['email' => $variant, 'password' => 'tebakan']);
+    }
+
+    (new Browser('203.0.113.80'))->post('/login', ['email' => 'dewi@example.test', 'password' => AuthHelpers::PASSWORD])->assertSessionHasErrors('email');
+    expect($user->id)->toBeInt();
 });
 
 it('akun lain di IP yang sama tidak ikut terkunci oleh batas akun', function () {
@@ -121,4 +160,18 @@ it('batas per IP juga berakhir setelah 15 menit', function () {
     Clock::at($start->copy()->addMinutes(15)->addSeconds(5));
 
     $attacker->login($victim->email, AuthHelpers::PASSWORD)->assertRedirect('/dashboard');
+});
+
+it('limiter menormalkan email SENDIRI pada kunci akun (tidak bergantung pada TrimStrings/Canonicalize)', function () {
+    $limiter = app(LoginRateLimiter::class);
+    $request = fn (string $email, string $ip) => tap(Request::create('/login', 'POST', ['email' => $email]), fn ($r) => $r->server->set('REMOTE_ADDR', $ip));
+
+    foreach (['dewi@example.test', 'DEWI@EXAMPLE.TEST', '  dewi@example.test  ', 'Dewi@Example.Test'] as $i => $variant) {
+        $limiter->increment($request($variant, '198.51.100.'.(100 + $i)));
+    }
+    expect($limiter->tooManyAttempts($request('dewi@example.test', '203.0.113.200')))->toBeFalse(); // baru 4
+
+    $limiter->increment($request("\tDEWI@example.test", '198.51.100.110'));
+    expect($limiter->tooManyAttempts($request('dewi@example.test', '203.0.113.201')))->toBeTrue(); // 5 dari 5 IP berbeda
+    expect($limiter->tooManyAttempts($request('lain@example.test', '203.0.113.202')))->toBeFalse();
 });
