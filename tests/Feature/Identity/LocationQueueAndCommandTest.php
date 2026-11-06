@@ -6,13 +6,16 @@ use App\Support\Console\InteractsWithLocation;
 use App\Support\Contracts\LocationAware;
 use App\Support\Exceptions\LocationNotAllowed;
 use App\Support\Exceptions\MissingLocationContext;
+use App\Support\Jobs\CapturesLocationActor;
 use App\Support\Jobs\RunsInLocation;
 use App\Support\LocationContext;
 use Illuminate\Bus\Queueable;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use Tests\Feature\Identity\LocationFixtures;
 use Tests\Fixtures\Models\SampleLocatedLine;
 
@@ -22,16 +25,14 @@ use function Pest\Laravel\artisan;
 /** Job contoh: mencatat nama baris yang terlihat dalam konteksnya. */
 final class CountLinesJob implements LocationAware, ShouldQueue
 {
-    use Dispatchable, Queueable;
+    use CapturesLocationActor, Dispatchable, Queueable;
 
     /** @var list<array{location: int, names: list<string>}> */
     public static array $seen = [];
 
-    public function __construct(private readonly int $locationId) {}
-
-    public function locationId(): int
+    public function __construct(int $locationId)
     {
-        return $this->locationId;
+        $this->bindLocation($locationId); // diperiksa saat DISPATCH, bukan hanya saat dijalankan (F2)
     }
 
     /** @return list<object> */
@@ -42,7 +43,7 @@ final class CountLinesJob implements LocationAware, ShouldQueue
 
     public function handle(): void
     {
-        self::$seen[] = ['location' => $this->locationId, 'names' => SampleLocatedLine::query()->pluck('name')->all()];
+        self::$seen[] = ['location' => $this->locationId(), 'names' => SampleLocatedLine::query()->pluck('name')->all()];
     }
 }
 
@@ -107,11 +108,76 @@ it('job di worker yang sama untuk dua lokasi berurutan tidak saling melihat', fu
     expect(array_column(CountLinesJob::$seen, 'names'))->toBe([['B-1'], ['A-1'], ['B-1']]);
 });
 
-it('job yang dipasang middleware menolak lokasi di luar akses user yang sedang login', function () {
+it('F2: user tidak bisa men-dispatch job untuk lokasi di luar aksesnya (dicek saat dispatch, bukan saat dijalankan)', function () {
     $d = LocationFixtures::boot();
     CountLinesJob::$seen = [];
     actingAs($d['userA']);
-    expect(fn () => CountLinesJob::dispatchSync($d['b']->id))->toThrow(LocationNotAllowed::class);
+
+    expect(fn () => new CountLinesJob($d['b']->id))->toThrow(LocationNotAllowed::class);
+    expect(fn () => CountLinesJob::dispatch($d['b']->id))->toThrow(LocationNotAllowed::class);
+});
+
+it('F2: job async (diserialisasi, tanpa Auth di worker) memeriksa ulang akses pemicunya', function () {
+    $d = LocationFixtures::boot();
+    CountLinesJob::$seen = [];
+
+    // 1. Request user A men-dispatch job untuk lokasinya sendiri.
+    actingAs($d['userA']);
+    $payload = serialize(new CountLinesJob($d['a']->id));
+
+    // 2. Worker: tidak ada user login, job di-unserialize lalu dijalankan.
+    Auth::forgetGuards();
+    app()->forgetScopedInstances();
+    $job = unserialize($payload);
+    expect($job->triggeredByUserId())->toBe($d['userA']->id);
+    app(Dispatcher::class)->dispatchSync($job);
+    expect(CountLinesJob::$seen)->toBe([['location' => $d['a']->id, 'names' => ['A-1']]]);
+});
+
+it('F2: akses yang dicabut antara dispatch dan eksekusi membuat job ditolak', function () {
+    $d = LocationFixtures::boot();
+    CountLinesJob::$seen = [];
+    actingAs($d['userA']);
+    $payload = serialize(new CountLinesJob($d['a']->id));
+
+    $d['userA']->locations()->detach($d['a']->id); // akses dicabut setelah dispatch
+    Auth::forgetGuards();
+    app()->forgetScopedInstances();
+
+    expect(fn () => app(Dispatcher::class)->dispatchSync(unserialize($payload)))
+        ->toThrow(LocationNotAllowed::class);
+    expect(CountLinesJob::$seen)->toBe([]);
+});
+
+it('F2: pemicu yang sudah dihapus membuat job ditolak', function () {
+    $d = LocationFixtures::boot();
+    CountLinesJob::$seen = [];
+    actingAs($d['userA']);
+    $payload = serialize(new CountLinesJob($d['a']->id));
+
+    $d['userA']->locations()->detach();
+    $d['userA']->delete();
+    Auth::forgetGuards();
+    app()->forgetScopedInstances();
+
+    expect(fn () => app(Dispatcher::class)->dispatchSync(unserialize($payload)))
+        ->toThrow(LocationNotAllowed::class);
+});
+
+it('F2: job terjadwal/console tanpa pemicu (sistem) tetap jalan di lokasinya', function () {
+    $d = LocationFixtures::boot();
+    CountLinesJob::$seen = [];
+    $job = new CountLinesJob($d['b']->id); // tanpa login: console
+    expect($job->triggeredByUserId())->toBeNull();
+    app(Dispatcher::class)->dispatchSync($job);
+    expect(CountLinesJob::$seen)->toBe([['location' => $d['b']->id, 'names' => ['B-1']]]);
+});
+
+it('F2: dispatch dari request HTTP tanpa login ditolak', function () {
+    $d = LocationFixtures::boot();
+    CountLinesJob::$seen = [];
+    expect(fn () => LocationFixtures::asHttpRequest(fn () => new CountLinesJob($d['a']->id)))
+        ->toThrow(LocationNotAllowed::class);
 });
 
 it('command wajib menyebut lokasi dan hanya memproses lokasi itu', function () {

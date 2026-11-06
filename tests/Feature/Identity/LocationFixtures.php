@@ -6,6 +6,9 @@ namespace Tests\Feature\Identity;
 
 use App\Domain\Identity\Models\Location;
 use App\Domain\Identity\Models\User;
+use App\Support\Database\LocationGuard;
+use App\Support\LocationContext;
+use Closure;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Tests\Fixtures\Models\SampleLocatedLine;
@@ -38,6 +41,7 @@ final class LocationFixtures
             $table->timestampTz('occurred_at')->nullable();
             $table->timestampsTz();
         });
+        LocationGuard::attach('sample_located_lines'); // lapis terakhir di database (F4)
     }
 
     /** @return TwoLocations */
@@ -50,9 +54,32 @@ final class LocationFixtures
         $userA->locations()->attach($a);
         $userB->locations()->attach($b);
 
-        $lineA = SampleLocatedLine::withoutLocationScope()->create(['location_id' => $a->id, 'name' => 'A-1']);
-        $lineB = SampleLocatedLine::withoutLocationScope()->create(['location_id' => $b->id, 'name' => 'B-1']);
+        $lineA = self::seedLine(['location_id' => $a->id, 'name' => 'A-1']);
+        $lineB = self::seedLine(['location_id' => $b->id, 'name' => 'B-1']);
 
         return ['a' => $a, 'b' => $b, 'userA' => $userA, 'userB' => $userB, 'lineA' => $lineA, 'lineB' => $lineB];
+    }
+
+    /**
+     * Seeder/proses sistem: menulis location_id eksplisit hanya lewat konteks sistem yang disengaja (F3).
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    public static function seedLine(array $attributes): SampleLocatedLine
+    {
+        return app(LocationContext::class)->asSystem(fn () => SampleLocatedLine::withoutLocationScope()->create($attributes));
+    }
+
+    /** Jalankan $callback seolah-olah di request HTTP (bukan console). @template T @param Closure(): T $callback @return T */
+    public static function asHttpRequest(Closure $callback): mixed
+    {
+        $property = new \ReflectionProperty(app(), 'isRunningInConsole');
+        $original = $property->getValue(app());
+        $property->setValue(app(), false);
+        try {
+            return $callback();
+        } finally {
+            $property->setValue(app(), $original);
+        }
     }
 }

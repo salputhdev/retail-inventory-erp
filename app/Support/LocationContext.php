@@ -25,6 +25,8 @@ final class LocationContext
     /** @var array<int|string, list<int>> cache akses per user selama satu request/job */
     private array $userCache = [];
 
+    private int $systemDepth = 0;
+
     /**
      * Jalankan $callback dalam konteks lokasi eksplisit. Bila ada user login, lokasi harus bagian dari aksesnya.
      *
@@ -37,16 +39,10 @@ final class LocationContext
      */
     public function run(int|array $locationIds, Closure $callback): mixed
     {
-        $ids = array_values(array_unique(array_map('intval', (array) $locationIds)));
+        $ids = array_values(array_unique(array_map(LocationWriteGuard::normalize(...), (array) $locationIds)));
 
-        $user = Auth::user();
-        if ($user instanceof HasLocationAccess) {
-            $allowed = $this->allowedFor($user);
-            foreach ($ids as $id) {
-                if (! in_array($id, $allowed, true)) {
-                    throw LocationNotAllowed::for($id);
-                }
-            }
+        foreach ($ids as $id) {
+            $this->assertAllowed($id);
         }
 
         $this->stack[] = $ids;
@@ -54,6 +50,60 @@ final class LocationContext
             return $callback();
         } finally {
             array_pop($this->stack);
+        }
+    }
+
+    /**
+     * Jalankan $callback sebagai proses SISTEM (seeder, command, job terjadwal): boleh menulis location_id eksplisit
+     * tanpa konteks user. Hanya di console; di request HTTP ditolak. Pembacaan tetap lewat run()/withoutLocationScope().
+     *
+     * @template T
+     *
+     * @param  Closure(): T  $callback
+     * @return T
+     */
+    public function asSystem(Closure $callback): mixed
+    {
+        if (! app()->runningInConsole()) {
+            throw LocationNotAllowed::systemOnly();
+        }
+
+        $this->systemDepth++;
+        try {
+            return $callback();
+        } finally {
+            $this->systemDepth--;
+        }
+    }
+
+    public function isSystem(): bool
+    {
+        return $this->systemDepth > 0;
+    }
+
+    /**
+     * Pastikan principal saat ini boleh memakai lokasi ini. Dipanggil oleh run() dan saat men-dispatch job (F2/F3):
+     *  - user login yang HasLocationAccess: lokasi harus termasuk akses;
+     *  - principal login lain (mis. token API non-User): ditolak;
+     *  - tanpa login: hanya diizinkan di console (scheduler/command); di request HTTP guest ditolak.
+     *
+     * @throws LocationNotAllowed
+     */
+    public function assertAllowed(int $locationId): void
+    {
+        $user = $this->principal();
+
+        if ($user === null) {
+            if (app()->runningInConsole()) {
+                return;
+            }
+            throw LocationNotAllowed::for($locationId);
+        }
+        if (! $user instanceof HasLocationAccess) {
+            throw LocationNotAllowed::unknownPrincipal();
+        }
+        if (! in_array($locationId, $this->allowedFor($user), true)) {
+            throw LocationNotAllowed::for($locationId);
         }
     }
 
@@ -78,15 +128,18 @@ final class LocationContext
         throw MissingLocationContext::make();
     }
 
-    /** Ada konteks (eksplisit atau user) tanpa melempar? */
-    public function hasContext(): bool
-    {
-        return $this->stack !== [] || Auth::user() instanceof HasLocationAccess;
-    }
-
     public function forgetUserCache(): void
     {
         $this->userCache = [];
+    }
+
+    /**
+     * Principal yang sedang login pada guard default. Tipenya sengaja `?object`: guard lain (mis. token API)
+     * bisa mengembalikan principal yang BUKAN User, dan itu harus ditolak, bukan dianggap mustahil.
+     */
+    private function principal(): ?object
+    {
+        return Auth::user();
     }
 
     /** @return list<int> */

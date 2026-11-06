@@ -33,7 +33,7 @@ Laravel + Livewire + Alpine + Bootstrap + PostgreSQL. Modular monolith; domain c
 
 ## Non-negotiables
 - Stock never changes except through the `PostStockMovement` action. See the `inventory-ledger` skill.
-- Every transactional table has `location_id`; every query on it is location-scoped.
+- Every transactional table has `location_id`; every query on it is location-scoped. New transactional table: model uses `BelongsToLocation`, migration calls `LocationGuard::attach()` (ADR-003). Write location data only through the model or `Model::query()->insert()`, never raw `DB::table()->insert()`.
 - Quantities `numeric(14,3)`, money `numeric(14,4)`, timestamps `timestamptz`. Never float.
 - Business logic lives in Action classes, not controllers or Livewire components.
 - UI uses Bootstrap classes and shared Blade components in `resources/views/components/`; no Tailwind. Bootstrap JS widgets (modal, dropdown, toast, tooltip) are driven by Alpine or wrapped in `wire:ignore`; Livewire pagination uses the `bootstrap` theme.

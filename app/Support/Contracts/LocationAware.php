@@ -8,4 +8,7 @@ namespace App\Support\Contracts;
 interface LocationAware
 {
     public function locationId(): int;
+
+    /** ID user yang memicu job (null = proses sistem/terjadwal). Dicek ulang saat job dijalankan. */
+    public function triggeredByUserId(): ?int;
 }

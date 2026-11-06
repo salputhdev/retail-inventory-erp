@@ -6,7 +6,6 @@ use App\Domain\Identity\Models\Location;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Tests\Feature\Identity\LocationFixtures;
-use Tests\Fixtures\Models\SampleLocatedLine;
 
 // ---- Kriteria 4 (I-01): simpan UTC, tampilkan sesuai zona waktu lokasi
 
@@ -15,7 +14,7 @@ it('menyimpan waktu sebagai UTC di database walau input berzona waktu lokasi', f
     $location = $d['a']; // Asia/Jakarta (UTC+7)
     $utc = $location->toUtc('2026-11-06 10:00:00'); // 10:00 WIB = 03:00 UTC
 
-    $line = SampleLocatedLine::withoutLocationScope()->create([
+    $line = LocationFixtures::seedLine([
         'location_id' => $location->id, 'name' => 'tz', 'occurred_at' => $utc,
     ]);
 
@@ -61,7 +60,7 @@ it('pulang-pergi UTC <-> lokal tidak mengubah instan waktu', function () {
 
 it('zona waktu tiap lokasi dipakai terpisah pada data yang sama', function () {
     $d = LocationFixtures::boot();
-    $line = SampleLocatedLine::withoutLocationScope()->create([
+    $line = LocationFixtures::seedLine([
         'location_id' => $d['b']->id, 'name' => 'mks', 'occurred_at' => '2026-11-06 03:00:00+00',
     ]);
     $line->refresh();

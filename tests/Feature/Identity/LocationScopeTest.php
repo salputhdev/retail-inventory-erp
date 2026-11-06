@@ -119,10 +119,20 @@ it('mass assignment location_id oleh user tidak melewati pengaman', function () 
         ->toThrow(LocationNotAllowed::class);
 });
 
-it('seeder/sistem boleh menulis eksplisit tanpa konteks', function () {
+it('tanpa konteks apa pun, penulisan GAGAL TERTUTUP (F3)', function () {
     $d = LocationFixtures::boot();
-    $line = SampleLocatedLine::withoutLocationScope()->create(['name' => 'seed', 'location_id' => $d['b']->id]);
+    expect(fn () => SampleLocatedLine::withoutLocationScope()->create(['name' => 'x', 'location_id' => $d['b']->id]))
+        ->toThrow(MissingLocationContext::class);
+    expect(SampleLocatedLine::withoutLocationScope()->count())->toBe(2);
+});
+
+it('proses sistem menulis eksplisit lewat asSystem(), dan hanya di console', function () {
+    $d = LocationFixtures::boot();
+    $line = LocationFixtures::seedLine(['name' => 'seed', 'location_id' => $d['b']->id]);
     expect($line->location_id)->toBe($d['b']->id);
+
+    expect(fn () => LocationFixtures::asHttpRequest(fn () => app(LocationContext::class)->asSystem(fn () => 1)))
+        ->toThrow(LocationNotAllowed::class, 'console');
 });
 
 // ---- LocationContext eksplisit

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 /**
  * Lokasi (toko/gudang). Sengaja TIDAK memakai BelongsToLocation: ini sumber scope itu sendiri.
@@ -21,13 +22,18 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $name
  * @property string $timezone
  * @property bool $is_active
+ * @property Carbon|null $cutover_at
  */
 class Location extends Model
 {
     /** @use HasFactory<LocationFactory> */
     use HasFactory, SoftDeletes;
 
-    protected $guarded = [];
+    /**
+     * Mass assignment dibatasi eksplisit (F5). `cutover_at` (MG-03: transaksi POS sebelumnya diabaikan) dan `is_active`
+     * sengaja TIDAK fillable: ubah lewat Action/method khusus yang bisa diaudit.
+     */
+    protected $fillable = ['code', 'name', 'timezone', 'opening_time', 'closing_time'];
 
     protected static function newFactory(): LocationFactory
     {
@@ -40,6 +46,16 @@ class Location extends Model
             'is_active' => 'boolean',
             'cutover_at' => 'datetime',
         ];
+    }
+
+    public function activate(): void
+    {
+        $this->forceFill(['is_active' => true])->save();
+    }
+
+    public function deactivate(): void
+    {
+        $this->forceFill(['is_active' => false])->save();
     }
 
     /** @return BelongsToMany<User, $this> */
