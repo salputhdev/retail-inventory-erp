@@ -61,11 +61,11 @@ Status task: ⬜ 61 todo · 🔄 0 doing · 👀 3 review · ✅ 9 done · ⛔ 0
 
 | Item | Isi |
 | ---- | --- |
-| Tanggal | 2026-11-06 |
-| Posisi | **M0 selesai**. 9/73 task `done`. T1.01 dan T1.02 ter-merge (`review`). **T1.03 `review`: PR terbuka**, 208 test hijau, uji mutasi 24/24 + 16/16 review, menunggu `/review-security` (R4) dan merge oleh Salman. |
-| Berikutnya | 1) `/review-security main` pada PR T1.03, perbaiki temuan, merge. 2) **T1.04 RBAC & segregasi tugas** (bergantung T1.02; menutup ISS-014 Policy `Location`, ISS-017). T1.05 (2FA wajib, mempertahankan aturan ADR-013), T1.07 (audit persisten, ISS-019), T1.08 (admin user, ISS-018/020). Satu PR per task dari `main`. |
-| Perlu diingat | Baca **`docs/LESSONS.md`** dulu (jebakan yang sudah memakan waktu). Test lokal: `DB_USERNAME=salman DB_PASSWORD= ./vendor/bin/pest`; Docker butuh `/Applications/Docker.app/Contents/Resources/bin` di PATH. Repo aktif: `salputhdev/retail-inventory-erp`. Proyek ini **portfolio** (tanpa klien nyata); hindari seremoni berlebih tapi ikuti `WORKFLOW.md`. |
-| Isu terbuka | ISS-014 Policy `Location` (T1.04) · ISS-015 insert mentah (T2.01) · ISS-016 S4 insert massal (sebelum endpoint) · ISS-017 S5 pelaku cutover (T1.04/T1.07) · ISS-018 **pertanyaan untuk Salman**: lokasi nonaktif read-only atau diblokir? · ISS-013 deviasi staging lokal · ISS-009 versi terbaru belum disetujui architect · ISS-005, ISS-007 (rendah) |
+| Tanggal | 2026-11-06 (sesi dihentikan atas permintaan Salman) |
+| Posisi | **M0 selesai** (9/73 task `done`). T1.01 dan T1.02 ter-merge (`review`). **T1.03 `review`: PR #15 terbuka, CI hijau, 208 test.** Review keamanan #1 menemukan F1–F4 (medium) dan semuanya sudah diperbaiki + diuji mutasi (16/16); F5–F8 dicatat ISS-021..024. **Belum ada review ulang `/review-security` setelah perbaikan, dan belum di-merge.** T1.04 dan seterusnya belum dimulai. |
+| Berikutnya | 1) Salman: `/review-security main` ulang pada PR #15, putuskan **F3** (kunci per akun = akun bisa dikunci orang lain 15 menit; ADR-013), lalu merge (bypass admin, merge commit). 2) **T1.04 RBAC + segregasi tugas** dari `main` (menutup ISS-014 Policy `Location`, ISS-017). 3) Lalu T1.05 (2FA, pertahankan aturan ADR-013), T1.07 (audit persisten, ISS-019/022), T1.08 (admin user, ISS-018/020/023). Satu PR per task dari `main`. |
+| Perlu diingat | Baca **`docs/LESSONS.md`** dulu. Test lokal: `DB_USERNAME=salman DB_PASSWORD= ./vendor/bin/pest` (butuh PostgreSQL lokal). Docker butuh `/Applications/Docker.app/Contents/Resources/bin` di PATH. Repo aktif: `salputhdev/retail-inventory-erp`. Proyek ini **portfolio**; ikuti `WORKFLOW.md` tanpa seremoni berlebih. Tabel transaksional baru: `BelongsToLocation` + `LocationGuard::attach()` + indeks unik memuat `location_id` (ADR-003). Test auth: pakai `Tests\Support\Browser` (bawa cookie), jangan `$this` di closure Pest. |
+| Isu terbuka | **Perlu keputusan Salman:** F3 kunci per akun (ADR-013), ISS-018 lokasi nonaktif read-only atau diblokir. **Teknis:** ISS-014 (T1.04), ISS-015, ISS-016, ISS-017 (T1.04/T1.07), ISS-019 audit persisten (T1.07), ISS-020 email huruf kecil (T1.08), ISS-021..024 (low), ISS-013, ISS-009, ISS-005, ISS-007. |
 | Mulai sesi baru | Tempel: *"Baca CLAUDE.md, TODO.md §2–4 dan §8, serta docs/LESSONS.md. Lanjutkan sesuai handoff §3."* |
 
 ---
@@ -381,6 +381,7 @@ Satu baris per kejadian penting: task selesai, keputusan, perubahan scope, jawab
 
 | Tanggal | Kejadian | Terkait |
 | ------- | -------- | ------- |
+| 2026-11-06 | Checkpoint akhir sesi: handoff §3 ditulis ulang; PR #15 (T1.03) menunggu review ulang keamanan dan merge | T1.03 |
 | 2026-11-06 | T1.03: review keamanan PR #15 menemukan F1–F4 (medium); semuanya ditutup (respons lupa-password identik termasuk JSON, hash palsu di-cache, batas login per akun, batas confirm-password) + batas POST umum; 16 mutan terdeteksi; F5–F8 dicatat ISS-021..024. Keputusan untuk Salman: kunci per akun memungkinkan DoS akun (ADR-013) | T1.03, ADR-013 |
 | 2026-11-06 | T1.03: autentikasi Fortify selesai (review): 193 test, uji mutasi 24/24; ADR-013; ISS-019 (audit persisten di T1.07) dan ISS-020 (email huruf kecil di T1.08) dicatat | T1.03, ADR-013 |
 | 2026-11-06 | T1.02: review keamanan kedua (PR #14) menemukan S1–S3 (bypass builder: upsert, insertOrIgnoreReturning/Using, updateFrom, truncate); ditutup + deny-by-default + penjaga metode baru Laravel; S4, S5, dan lokasi nonaktif dicatat sebagai ISS-016/017/018 | T1.02, ADR-003 |
