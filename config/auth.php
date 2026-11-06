@@ -5,6 +5,14 @@ use App\Domain\Identity\Models\User;
 return [
 
     /*
+    | Batas absolut sesi (S-04): menit sejak login, walau aktif terus.
+    */
+    'absolute_timeout_minutes' => (int) env('AUTH_ABSOLUTE_TIMEOUT_MINUTES', 720),
+
+    // Idle timeout (S-04): 30 menit. Harus <= SESSION_LIFETIME agar TTL driver tidak lebih longgar.
+    'idle_timeout_minutes' => (int) env('AUTH_IDLE_TIMEOUT_MINUTES', 30),
+
+    /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
     |--------------------------------------------------------------------------

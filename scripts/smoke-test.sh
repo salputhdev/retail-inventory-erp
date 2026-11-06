@@ -35,7 +35,10 @@ if [ -n "$cookies" ]; then
 else
   skip "Cookie sesi belum diterbitkan di halaman awal (cek lagi setelah login ada, M1)"
 fi
-skip "Login dan dashboard (M1/M5)"
+check "Halaman login tersedia (200)"            '[ "$(curl -sk -o /dev/null -w "%{http_code}" --max-time 15 "$HTTPS/login")" = 200 ]'
+check "Dashboard mewajibkan login (302 ke /login)" '[ "$(curl -sk -o /dev/null -w "%{http_code} %{redirect_url}" --max-time 15 "$HTTPS/dashboard")" = "302 $HTTPS/login" ]'
+check "Registrasi publik tidak ada (404)"       '[ "$(curl -sk -o /dev/null -w "%{http_code}" --max-time 15 "$HTTPS/register")" = 404 ]'
+skip "Login sungguhan dengan user seed (T1.14)"
 skip "Horizon aktif (M3)"
 
 echo
