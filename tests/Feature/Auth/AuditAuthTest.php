@@ -3,9 +3,8 @@
 declare(strict_types=1);
 
 use App\Support\Audit\AuditTrail;
-use App\Support\Audit\LogAuditTrail;
+use App\Support\Audit\DatabaseAuditTrail;
 use App\Support\Audit\Redactor;
-use Illuminate\Support\Facades\Log;
 use Tests\Support\AuthHelpers;
 use Tests\Support\Browser;
 
@@ -55,22 +54,22 @@ it('Redactor menyamarkan kunci sensitif (termasuk bersarang) dan memotong string
     expect($clean['objek'])->toBe('[stdClass]')->and($clean['angka'])->toBe(5);
 });
 
-it('LogAuditTrail menulis ke channel "audit" dengan konteks yang sudah disamarkan', function () {
-    Log::shouldReceive('channel')->once()->with('audit')->andReturnSelf();
-    Log::shouldReceive('info')->once()->withArgs(function (string $action, array $context) {
-        return $action === 'contoh.aksi'
-            && $context['password'] === '[disamarkan]'
-            && $context['actor_id'] === 7
-            && array_key_exists('ip', $context);
-    });
-
-    (new LogAuditTrail)->record('contoh.aksi', ['password' => 'rahasia'], 7);
+it('AuditTrail terikat ke DatabaseAuditTrail (T1.07)', function () {
+    expect(app(AuditTrail::class))->toBeInstanceOf(DatabaseAuditTrail::class);
 });
 
-it('channel audit menyimpan 365 hari dan file tidak bisa dibaca semua user', function () {
-    $channel = config('logging.channels.audit');
+// ---- ISS-022: email yang bukan format email tidak dicatat apa adanya
+it('ISS-022: email login yang bukan format email dicatat sebagai [bukan-email], bukan nilai asli', function () {
+    $audit = AuthHelpers::fakeAudit();
+    (new Browser)->post('/login', ['email' => 'Kata-Sandi-Tertukar-123', 'password' => 'x']);
 
-    expect($channel['max_files'])->toBeGreaterThanOrEqual(365); // L-01: retensi >= 1 tahun
-    expect($channel['permission'])->toBe(0640);
-    expect(app(AuditTrail::class))->toBeInstanceOf(LogAuditTrail::class);
+    expect($audit->records[0]['context']['email'])->toBe('[bukan-email]');
+    expect(json_encode($audit->records))->not->toContain('Kata-Sandi-Tertukar-123');
+});
+
+it('ISS-022: email login yang valid tetap dicatat apa adanya (dinormalisasi)', function () {
+    $audit = AuthHelpers::fakeAudit();
+    (new Browser)->post('/login', ['email' => 'Normal@Example.test', 'password' => 'x']);
+
+    expect($audit->records[0]['context']['email'])->toBe('normal@example.test');
 });

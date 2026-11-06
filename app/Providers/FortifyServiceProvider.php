@@ -67,7 +67,7 @@ class FortifyServiceProvider extends ServiceProvider
             $actorId = (int) $user->getAuthIdentifier();
 
             if (RateLimiter::tooManyAttempts($key, FifteenMinuteLoginRateLimiter::MAX_PER_ACCOUNT)) {
-                $audit->record('auth.lockout', ['via' => 'confirm_password'], $actorId);
+                $audit->record('auth.lockout', ['via' => 'confirm_password'], $actorId, $user);
 
                 return false;
             }
@@ -79,7 +79,7 @@ class FortifyServiceProvider extends ServiceProvider
             }
 
             RateLimiter::hit($key, FifteenMinuteLoginRateLimiter::WINDOW_SECONDS);
-            $audit->record('auth.confirm_password_failed', [], $actorId);
+            $audit->record('auth.confirm_password_failed', [], $actorId, $user);
 
             return false;
         });

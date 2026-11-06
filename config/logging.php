@@ -73,16 +73,6 @@ return [
             'replace_placeholders' => true,
         ],
 
-        // Audit log sementara (T1.03); T1.07 memindahkannya ke tabel database yang tidak bisa diubah dari aplikasi.
-        'audit' => [
-            'driver' => 'daily',
-            'path' => storage_path('logs/audit.log'),
-            'level' => 'info',
-            'max_files' => (int) env('AUDIT_LOG_DAYS', 365), // L-01: retensi >= 1 tahun
-            'replace_placeholders' => true,
-            'permission' => 0640,
-        ],
-
         'monthly' => [
             'driver' => 'monthly',
             'path' => storage_path('logs/laravel.log'),

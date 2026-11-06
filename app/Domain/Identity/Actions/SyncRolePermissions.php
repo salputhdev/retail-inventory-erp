@@ -42,16 +42,19 @@ final class SyncRolePermissions
 
         $before = $role->permissions()->pluck('name')->sort()->values()->all();
 
-        DB::transaction(fn () => $role->syncPermissions($after));
+        // Perubahan dan audit dalam satu transaksi (ISS-027): bila salah satu gagal, tidak ada yang tersimpan.
+        DB::transaction(function () use ($role, $after, $before, $actor) {
+            $role->syncPermissions($after);
+
+            $this->audit->record('rbac.role_permissions_changed', [
+                'role' => $role->name,
+                'before' => $before,
+                'after' => $after,
+            ], $actor->id, $role);
+        });
 
         // Spatie membuang cache di dalam transaksi; request lain bisa mengisinya lagi dengan data lama sebelum commit.
         $this->registrar->forgetCachedPermissions();
-
-        $this->audit->record('rbac.role_permissions_changed', [
-            'role' => $role->name,
-            'before' => $before,
-            'after' => $after,
-        ], $actor->id);
 
         return $role;
     }

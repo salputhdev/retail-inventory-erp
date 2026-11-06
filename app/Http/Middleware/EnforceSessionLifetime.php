@@ -56,7 +56,7 @@ final class EnforceSessionLifetime
         Auth::guard()->logout();
         $session->invalidate();
         $session->regenerateToken();
-        $this->audit->record('auth.session_expired', ['reason' => $reason], $actorId);
+        $this->audit->record('auth.session_expired', ['reason' => $reason], $actorId, $user);
 
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Sesi berakhir.'], 401);

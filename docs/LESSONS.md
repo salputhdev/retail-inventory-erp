@@ -61,6 +61,13 @@ Hal-hal yang sudah memakan waktu di M0–T1.02 dan jangan diulang. Tambahkan bar
 - Closure di dalam baris dataset Pest tidak dievaluasi; jangan membuat model di dataset (model ter-boot sebelum aplikasi siap).
 - Lokal tanpa Docker: `artisan db:seed` butuh `CACHE_STORE=array` (PHP host tidak punya ekstensi redis).
 
+## Audit log (T1.07)
+- Postgres menggagalkan SELURUH transaksi setelah satu statement gagal (`25P02 current transaction is aborted`): test yang mencoba dua pelanggaran trigger berturutan (update lalu delete) harus membungkus tiap percobaan dengan `DB::transaction()` sendiri (jadi savepoint), bukan satu transaksi test untuk semuanya.
+- Redaksi data sensitif harus dijalankan **sebelum** `->create()`, bukan saat membaca: kalau hanya disamarkan di accessor, nilai asli tetap ada di kolom `jsonb` dan bisa dibaca lewat `DB::table()` mentah.
+- Trigger `BEFORE UPDATE OR DELETE` (append-only) berlaku untuk SEMUA jalur, termasuk `DB::table()->update()/delete()` mentah — tidak bisa diakali lewat bypass Eloquent.
+- `array $old === $array $new` di Pest gagal untuk array asosiatif yang urutannya beda (round-trip lewat `jsonb`/cast `array` bisa mengubah urutan key): pakai `toEqual()`, bukan `toBe()`, untuk membandingkan isi array tanpa peduli urutan.
+- Mengubah perubahan+audit menjadi satu `DB::transaction()` (dari sebelumnya dua langkah) cukup diuji dengan fake `AuditTrail` yang melempar exception di tengah: kalau perubahan ikut batal, transaksinya benar atomic.
+
 ## Cara menguji pengaman (uji mutasi)
 - Rusak pengaman satu per satu, pastikan test gagal, lalu pulihkan. **Pakai skrip `bash` dengan cadangan nyata dan `cmp`**: di zsh `$FILES` tidak dipecah per kata, cadangan gagal diam-diam, dan mutasi menumpuk di file produksi (terjadi sekali; dipulihkan manual).
 - File yang belum ter-track git tidak bisa dipulihkan dengan `git checkout`.
