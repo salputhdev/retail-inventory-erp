@@ -62,10 +62,11 @@ Status task: ⬜ 62 todo · 🔄 0 doing · 👀 2 review · ✅ 9 done · ⛔ 0
 | Item | Isi |
 | ---- | --- |
 | Tanggal | 2026-11-06 |
-| Posisi | T0.04 `review`: kerangka Laravel 13 terbaru terverifikasi lokal dan di Docker (`make setup` dari salinan bersih 3 mnt 4 dtk, `make test`, modal di browser). Pest, Pint, Larastan, build Vite hijau. |
-| Berikutnya | Salman menjalankan `/review-security main` pada PR T1.02 (R4) dan me-merge. Lalu T1.03 (autentikasi) dan T1.04 (RBAC & segregasi tugas, bergantung T1.02), satu PR per task. |
-| Perlu diingat | T0.04 dimulai sebelum T0.02/T0.03 (ISS-009), jadi `todo-summary --check` sengaja gagal sampai keduanya selesai. Versi terbaru belum disetujui architect (ADR-009). Di Mac ini `docker-credential-desktop` belum ada di PATH: tambahkan `/Applications/Docker.app/Contents/Resources/bin`. Test selalu lewat `make test` (DB `_test`). |
-| Menunggu klien | Vendor POS + contoh file (ISS-001), pilihan hosting (ISS-002), sumber data migrasi (ISS-003). |
+| Posisi | **M0 selesai** (gate ditandatangani, T0.01–T0.09 `done`). 9/73 task, 33/356 jam. T1.01 `review` (ter-merge, PR #13). **T1.02 `review`: PR #14 terbuka**, CI hijau, 138 test, dua review keamanan (F1–F5, S1–S3) sudah ditutup, tinggal merge oleh Salman. T1.03 dan seterusnya belum dimulai. |
+| Berikutnya | 1) Salman merge PR #14 (bypass admin, merge commit). 2) **T1.03 Autentikasi** (Fortify; menambah dependensi = zona kuning, minta persetujuan). 3) T1.04 RBAC + Policy `Location` (ISS-014). Risiko R4: `/review-security` oleh Salman. Satu PR per task dari `main`. |
+| Perlu diingat | Baca **`docs/LESSONS.md`** dulu (jebakan yang sudah memakan waktu). Test lokal: `DB_USERNAME=salman DB_PASSWORD= ./vendor/bin/pest`; Docker butuh `/Applications/Docker.app/Contents/Resources/bin` di PATH. Repo aktif: `salputhdev/retail-inventory-erp`. Proyek ini **portfolio** (tanpa klien nyata); hindari seremoni berlebih tapi ikuti `WORKFLOW.md`. |
+| Isu terbuka | ISS-014 Policy `Location` (T1.04) · ISS-015 insert mentah (T2.01) · ISS-016 S4 insert massal (sebelum endpoint) · ISS-017 S5 pelaku cutover (T1.04/T1.07) · ISS-018 **pertanyaan untuk Salman**: lokasi nonaktif read-only atau diblokir? · ISS-013 deviasi staging lokal · ISS-009 versi terbaru belum disetujui architect · ISS-005, ISS-007 (rendah) |
+| Mulai sesi baru | Tempel: *"Baca CLAUDE.md, TODO.md §2–4 dan §8, serta docs/LESSONS.md. Lanjutkan sesuai handoff §3."* |
 
 ---
 
