@@ -50,7 +50,7 @@
 | M6 — Hardening & Handover | 0/7 | 0/33 | — | ░░░░░░░░░░ 0% | ⬜ belum mulai |
 | **Total** | **9/73** | **33/356** | **—** | **▓░░░░░░░░░ 9%** | |
 
-Status task: ⬜ 63 todo · 🔄 0 doing · 👀 1 review · ✅ 9 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 27/172  |  Isu terbuka: 4 (high: 0, menunggu pihak lain: 0)
+Status task: ⬜ 62 todo · 🔄 0 doing · 👀 2 review · ✅ 9 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 31/172  |  Isu terbuka: 9 (high: 0, menunggu pihak lain: 0)
 <!-- progress:end -->
 
 ---
@@ -62,10 +62,11 @@ Status task: ⬜ 63 todo · 🔄 0 doing · 👀 1 review · ✅ 9 done · ⛔ 0
 | Item | Isi |
 | ---- | --- |
 | Tanggal | 2026-11-06 |
-| Posisi | T0.04 `review`: kerangka Laravel 13 terbaru terverifikasi lokal dan di Docker (`make setup` dari salinan bersih 3 mnt 4 dtk, `make test`, modal di browser). Pest, Pint, Larastan, build Vite hijau. |
-| Berikutnya | Merge PR T1.01. Lalu T1.02 (lokasi & scope lokasi) dan T1.03 (autentikasi), dari `main`, satu PR per task. T1.04 (RBAC) bergantung T1.02. |
-| Perlu diingat | T0.04 dimulai sebelum T0.02/T0.03 (ISS-009), jadi `todo-summary --check` sengaja gagal sampai keduanya selesai. Versi terbaru belum disetujui architect (ADR-009). Di Mac ini `docker-credential-desktop` belum ada di PATH: tambahkan `/Applications/Docker.app/Contents/Resources/bin`. Test selalu lewat `make test` (DB `_test`). |
-| Menunggu klien | Vendor POS + contoh file (ISS-001), pilihan hosting (ISS-002), sumber data migrasi (ISS-003). |
+| Posisi | **M0 selesai** (gate ditandatangani, T0.01–T0.09 `done`). 9/73 task, 33/356 jam. T1.01 `review` (ter-merge, PR #13). **T1.02 `review`: PR #14 terbuka**, CI hijau, 138 test, dua review keamanan (F1–F5, S1–S3) sudah ditutup, tinggal merge oleh Salman. T1.03 dan seterusnya belum dimulai. |
+| Berikutnya | 1) Salman merge PR #14 (bypass admin, merge commit). 2) **T1.03 Autentikasi** (Fortify; menambah dependensi = zona kuning, minta persetujuan). 3) T1.04 RBAC + Policy `Location` (ISS-014). Risiko R4: `/review-security` oleh Salman. Satu PR per task dari `main`. |
+| Perlu diingat | Baca **`docs/LESSONS.md`** dulu (jebakan yang sudah memakan waktu). Test lokal: `DB_USERNAME=salman DB_PASSWORD= ./vendor/bin/pest`; Docker butuh `/Applications/Docker.app/Contents/Resources/bin` di PATH. Repo aktif: `salputhdev/retail-inventory-erp`. Proyek ini **portfolio** (tanpa klien nyata); hindari seremoni berlebih tapi ikuti `WORKFLOW.md`. |
+| Isu terbuka | ISS-014 Policy `Location` (T1.04) · ISS-015 insert mentah (T2.01) · ISS-016 S4 insert massal (sebelum endpoint) · ISS-017 S5 pelaku cutover (T1.04/T1.07) · ISS-018 **pertanyaan untuk Salman**: lokasi nonaktif read-only atau diblokir? · ISS-013 deviasi staging lokal · ISS-009 versi terbaru belum disetujui architect · ISS-005, ISS-007 (rendah) |
+| Mulai sesi baru | Tempel: *"Baca CLAUDE.md, TODO.md §2–4 dan §8, serta docs/LESSONS.md. Lanjutkan sesuai handoff §3."* |
 
 ---
 
@@ -74,7 +75,6 @@ Status task: ⬜ 63 todo · 🔄 0 doing · 👀 1 review · ✅ 9 done · ⛔ 0
 *Task `todo` yang semua dependensi task-nya sudah `done`. Dibuat otomatis.*
 
 <!-- ready:start -->
-- **T1.02** Lokasi & scope lokasi (5 jam)
 - **T1.03** Autentikasi (6 jam)
 - **T1.07** Fondasi audit log (5 jam)
 - **T6.04** Production, backup & monitoring (6 jam) · prasyarat eksternal: ADR-006
@@ -107,7 +107,7 @@ Total: **73 task · 356 jam** (rentang PRD 310–400 jam). Detail tiap task: `do
 | ID | Task | Est | Aktual | Kriteria | Bergantung | Status | Selesai | Catatan |
 | -- | ---- | --- | ------ | -------- | ---------- | ------ | ------- | ------- |
 | T1.01 | Value object Quantity & Money | 3 | — | 3/3 | T0.04 | 👀 review | — | `Support\Quantity` (3 desimal), `Money` (4 desimal), `QuantityCast`/`MoneyCast`. 58 test Pest hijau; `0.1+0.2` = `0.3`; Larastan menolak float (test pada fixture) dan menerima Quantity/string/int. Medium, R3 |
-| T1.02 | Lokasi & scope lokasi | 5 | — | 0/4 | T0.04 | ⬜ todo | — |  |
+| T1.02 | Lokasi & scope lokasi | 5 | — | 4/4 | T0.04 | 👀 review | — | `locations`, `location_user`, `LocationScope` (gagal tertutup), `BelongsToLocation`, `LocationContext` (job/command eksplisit), waktu UTC↔zona lokasi. 138 test hijau; review keamanan #1 (F1–F5) dan #2 (S1–S3) ditutup (ADR-003); S4/S5 dicatat ISS-016/017; uji mutasi + rollback migrasi + trigger DB teruji. R4: menunggu verifikasi ulang `/review-security` oleh Salman |
 | T1.03 | Autentikasi | 6 | — | 0/3 | T0.04 | ⬜ todo | — |  |
 | T1.04 | RBAC & segregasi tugas | 6 | — | 0/3 | T1.02 | ⬜ todo | — |  |
 | T1.05 | 2FA wajib | 4 | — | 0/2 | T1.03, T1.04 | ⬜ todo | — |  |
@@ -301,6 +301,11 @@ ID berurutan (ISS-001, ISS-002, …), tidak dipakai ulang. Isu yang selesai diub
 | ISS-008 | debt | Catatan paralel M3/M4 di Architecture §10.1 tidak cocok dengan dependensi T4.10 → T3.12 | low | closed | T4.10 | Developer | 2026-11-05 | 2026-11-05 | Catatan §10.1 diperbaiki: T4.10 dikerjakan paling akhir di M4 |
 | ISS-009 | risk | T0.04 dimulai sebelum T0.02 (ADR-009 penguncian versi) dan T0.03 (repo klien) selesai; stack dipasang di versi terbaru atas perintah Salman | med | open | T0.04, T0.02, T0.03 | Developer | 2026-11-06 | — | Versi terpasang: Laravel 13.40, Livewire 4.4, Pest 5.3, Larastan 3.14, Bootstrap 5.3.8, Vite 8.3, PHP 8.5, PostgreSQL 18. Harus disetujui architect di ADR-009; bila ditolak, turunkan versi |
 | ISS-013 | change | T0.09 dilakukan sebagai staging lokal, bukan server: kriteria deploy otomatis ke server dan SSL Labs ≥ A disesuaikan (D1–D3) | med | open | T0.09, ADR-006 | Salman | 2026-11-06 | — | Diputuskan Salman (VPS dilewati: host situs live, 1 vCPU). Terima deviasi saat sign-off M0; hosting produksi nyata = ADR baru |
+| ISS-014 | change | `Location` tidak ber-scope: semua user bisa membaca semua lokasi lewat `Location::find()`; perlu Policy | med | open | T1.04, T1.02 | Developer | 2026-11-06 | — | Temuan review keamanan T1.02 (di luar F1–F5). Tutup di T1.04 (RBAC): Policy `Location` + test akses silang |
+| ISS-015 | debt | Insert mentah `DB::table(...)->insert()` ke tabel ber-lokasi tidak bisa dijaga database | low | open | T2.01 | Developer | 2026-11-06 | — | Dijaga code review + aturan di ADR-003. Pertimbangkan arch test saat tabel transaksional pertama ada (T2.01) |
+| ISS-016 | bug | S4: `LocationWriteGuard::assertRows` memeriksa `location_id` per baris dengan kunci asosiatif, sedangkan Laravel mengambil kolom dari baris pertama dan memetakan nilai menurut posisi; baris ke-2 dengan kunci lain yang urutannya sebelum `location_id` bisa memasukkan nilai tak tervalidasi | low | open | T1.02, T2.01 | Developer | 2026-11-06 | — | Review keamanan #2, status *suspected* (butuh PoC runtime). Perbaikan: wajibkan semua baris punya himpunan kunci identik dengan baris pertama. Selesai sebelum ada endpoint yang membentuk baris dari input user |
+| ISS-017 | risk | S5: `SetLocationCutover` menerima `actorUserId` dari pemanggil (bukan `Auth`), tidak memeriksa role/akses lokasi atau batas nilai cutover; `activate()/deactivate()` tidak diaudit | low | open | T1.04, T1.07 | Developer | 2026-11-06 | — | Review keamanan #2. Ambil pelaku dari `Auth`, pasang Policy (T1.04), audit log (T1.07), batasi nilai cutover. Wajib selesai sebelum Action dihubungkan ke UI |
+| ISS-018 | question | User di lokasi yang dinonaktifkan: `locationIds()` tidak memfilter `is_active`, jadi user tetap bisa baca/tulis | med | open | T1.08, PRD | Salman | 2026-11-06 | — | Temuan review keamanan #2 (§4). Keputusan produk: lokasi nonaktif = read-only atau terblokir penuh? Tetapkan di PRD sebelum T1.08 |
 | ISS-010 | debt | Docker lokal dan modal Bootstrap di browser belum diuji | med | closed | T0.04 | Developer | 2026-11-06 | 2026-11-06 | `make setup` dari salinan bersih berhasil; modal buka/tutup lolos sebelum dan sesudah re-render Livewire, console bersih. Temuan yang diperbaiki: PECL redis gagal di PHP 8.5, `artisan serve` membuang env Compose, port 5432 bentrok, test sempat menyentuh DB dev (kini dijaga `TestCase` + `make test`) |
 | ISS-011 | risk | Repo di akun GitHub pribadi (salputh/retail-inventory-platform), bukan organisasi klien | low | closed | T0.03, C-03 | Developer | 2026-11-06 | 2026-11-06 | Ditutup: ini proyek portfolio tanpa klien nyata; repo dipublikasikan setelah dipindai (tanpa secret/data klien). T0.03 tetap `todo` sebagai simulasi proses |
 | ISS-012 | bug | GitHub Actions tidak bisa berjalan di akun salputh: billing akun terkunci | high | closed | T0.05 | Salman | 2026-11-06 | 2026-11-06 | Diselesaikan dengan memindahkan repo ke organisasi salputhdev (billing terpisah): Actions berjalan. Repo kini salputhdev/retail-inventory-erp |
@@ -371,6 +376,9 @@ Satu baris per kejadian penting: task selesai, keputusan, perubahan scope, jawab
 
 | Tanggal | Kejadian | Terkait |
 | ------- | -------- | ------- |
+| 2026-11-06 | T1.02: review keamanan kedua (PR #14) menemukan S1–S3 (bypass builder: upsert, insertOrIgnoreReturning/Using, updateFrom, truncate); ditutup + deny-by-default + penjaga metode baru Laravel; S4, S5, dan lokasi nonaktif dicatat sebagai ISS-016/017/018 | T1.02, ADR-003 |
+| 2026-11-06 | T1.02: review keamanan (R4) menemukan 5 celah laten (F1–F5); semuanya ditutup dengan test + uji mutasi (10 mutan: 9 terdeteksi, 1 selamat karena pertahanan berlapis, terbukti terdeteksi saat kedua lapis dimatikan); ISS-014/015 dicatat | T1.02, ADR-003 |
+| 2026-11-06 | T1.02: scope lokasi (ADR-003) selesai; User dipindah ke `Domain\Identity`; 4/4 kriteria dibuktikan test; status `review` menunggu `/review-security` (R4) | T1.02, ADR-003 |
 | 2026-11-06 | T0.01–T0.09 (M0) ditandai `done` atas konfirmasi Salman setelah sign-off gate M0 | M0 |
 | 2026-11-06 | T1.01: value object Quantity & Money + cast Eloquent; 3/3 kriteria dibuktikan lewat test (aritmetika, pembulatan, overflow numeric(14,x), float ditolak runtime dan statis) | T1.01, AR-06 |
 | 2026-11-06 | Gate M0: Salman menandatangani `docs/milestones/M0.md` (Disetujui; deviasi D1–D6 diterima). Status task M0 tetap `review` sampai Salman menandai `done` | M0 |

@@ -97,6 +97,8 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // Sesi selalu UTC: timestamptz dibaca/ditulis konsisten (I-01).
+            'timezone' => 'UTC',
         ],
 
         'sqlsrv' => [
