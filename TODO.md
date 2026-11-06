@@ -50,7 +50,7 @@
 | M6 — Hardening & Handover | 0/7 | 0/33 | — | ░░░░░░░░░░ 0% | ⬜ belum mulai |
 | **Total** | **9/73** | **33/356** | **—** | **▓░░░░░░░░░ 9%** | |
 
-Status task: ⬜ 63 todo · 🔄 0 doing · 👀 1 review · ✅ 9 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 27/172  |  Isu terbuka: 4 (high: 0, menunggu pihak lain: 0)
+Status task: ⬜ 62 todo · 🔄 0 doing · 👀 2 review · ✅ 9 done · ⛔ 0 blocked  |  Kriteria terpenuhi: 31/172  |  Isu terbuka: 4 (high: 0, menunggu pihak lain: 0)
 <!-- progress:end -->
 
 ---
@@ -63,7 +63,7 @@ Status task: ⬜ 63 todo · 🔄 0 doing · 👀 1 review · ✅ 9 done · ⛔ 0
 | ---- | --- |
 | Tanggal | 2026-11-06 |
 | Posisi | T0.04 `review`: kerangka Laravel 13 terbaru terverifikasi lokal dan di Docker (`make setup` dari salinan bersih 3 mnt 4 dtk, `make test`, modal di browser). Pest, Pint, Larastan, build Vite hijau. |
-| Berikutnya | Merge PR T1.01. Lalu T1.02 (lokasi & scope lokasi) dan T1.03 (autentikasi), dari `main`, satu PR per task. T1.04 (RBAC) bergantung T1.02. |
+| Berikutnya | Salman menjalankan `/review-security main` pada PR T1.02 (R4) dan me-merge. Lalu T1.03 (autentikasi) dan T1.04 (RBAC & segregasi tugas, bergantung T1.02), satu PR per task. |
 | Perlu diingat | T0.04 dimulai sebelum T0.02/T0.03 (ISS-009), jadi `todo-summary --check` sengaja gagal sampai keduanya selesai. Versi terbaru belum disetujui architect (ADR-009). Di Mac ini `docker-credential-desktop` belum ada di PATH: tambahkan `/Applications/Docker.app/Contents/Resources/bin`. Test selalu lewat `make test` (DB `_test`). |
 | Menunggu klien | Vendor POS + contoh file (ISS-001), pilihan hosting (ISS-002), sumber data migrasi (ISS-003). |
 
@@ -74,7 +74,6 @@ Status task: ⬜ 63 todo · 🔄 0 doing · 👀 1 review · ✅ 9 done · ⛔ 0
 *Task `todo` yang semua dependensi task-nya sudah `done`. Dibuat otomatis.*
 
 <!-- ready:start -->
-- **T1.02** Lokasi & scope lokasi (5 jam)
 - **T1.03** Autentikasi (6 jam)
 - **T1.07** Fondasi audit log (5 jam)
 - **T6.04** Production, backup & monitoring (6 jam) · prasyarat eksternal: ADR-006
@@ -107,7 +106,7 @@ Total: **73 task · 356 jam** (rentang PRD 310–400 jam). Detail tiap task: `do
 | ID | Task | Est | Aktual | Kriteria | Bergantung | Status | Selesai | Catatan |
 | -- | ---- | --- | ------ | -------- | ---------- | ------ | ------- | ------- |
 | T1.01 | Value object Quantity & Money | 3 | — | 3/3 | T0.04 | 👀 review | — | `Support\Quantity` (3 desimal), `Money` (4 desimal), `QuantityCast`/`MoneyCast`. 58 test Pest hijau; `0.1+0.2` = `0.3`; Larastan menolak float (test pada fixture) dan menerima Quantity/string/int. Medium, R3 |
-| T1.02 | Lokasi & scope lokasi | 5 | — | 0/4 | T0.04 | ⬜ todo | — |  |
+| T1.02 | Lokasi & scope lokasi | 5 | — | 4/4 | T0.04 | 👀 review | — | `locations`, `location_user`, `LocationScope` (gagal tertutup), `BelongsToLocation`, `LocationContext` (job/command eksplisit), waktu UTC↔zona lokasi. 88 test hijau; uji mutasi 4/4 terdeteksi; rollback migrasi teruji. R4: menunggu `/review-security` oleh Salman |
 | T1.03 | Autentikasi | 6 | — | 0/3 | T0.04 | ⬜ todo | — |  |
 | T1.04 | RBAC & segregasi tugas | 6 | — | 0/3 | T1.02 | ⬜ todo | — |  |
 | T1.05 | 2FA wajib | 4 | — | 0/2 | T1.03, T1.04 | ⬜ todo | — |  |
@@ -371,6 +370,7 @@ Satu baris per kejadian penting: task selesai, keputusan, perubahan scope, jawab
 
 | Tanggal | Kejadian | Terkait |
 | ------- | -------- | ------- |
+| 2026-11-06 | T1.02: scope lokasi (ADR-003) selesai; User dipindah ke `Domain\Identity`; 4/4 kriteria dibuktikan test; status `review` menunggu `/review-security` (R4) | T1.02, ADR-003 |
 | 2026-11-06 | T0.01–T0.09 (M0) ditandai `done` atas konfirmasi Salman setelah sign-off gate M0 | M0 |
 | 2026-11-06 | T1.01: value object Quantity & Money + cast Eloquent; 3/3 kriteria dibuktikan lewat test (aritmetika, pembulatan, overflow numeric(14,x), float ditolak runtime dan statis) | T1.01, AR-06 |
 | 2026-11-06 | Gate M0: Salman menandatangani `docs/milestones/M0.md` (Disetujui; deviasi D1–D6 diterima). Status task M0 tetap `review` sampai Salman menandai `done` | M0 |
