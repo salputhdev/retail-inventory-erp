@@ -35,6 +35,16 @@ Hal-hal yang sudah memakan waktu di M0–T1.02 dan jangan diulang. Tambahkan bar
 - Tabel transaksional baru: model `BelongsToLocation`, migration `LocationGuard::attach()`, indeks unik memuat `location_id`, tanpa `DB::table()->insert()` mentah.
 - Pengaman tulis dipasang di `performInsert/performUpdate` dan builder, bukan event model (`saveQuietly`/`withoutEvents` melewati event).
 
+## Autentikasi (T1.03)
+- Fortify bawaan: throttle 1 menit; `limiters.login` terisi menghitung SEMUA request di route. Pakai `limiters.login => null` + `LoginRateLimiter` sendiri (hitung hanya gagal).
+- "Ingat saya" melewati batas sesi absolut (cookie panjang memicu event `Login` lagi): dimatikan.
+- Test HTTP Laravel tidak membawa cookie antar-request, dan objek session store dipakai ulang (atribut lama DIGABUNG saat load): gunakan `Tests\Support\Browser` (cookie + `flush()` store). Request JSON butuh `withCredentials()`.
+- Handler sesi `array` membuang sesi setelah `session.lifetime`: naikkan di test agar yang diuji adalah middleware, bukan TTL.
+- `$this` di closure Pest bertipe `TestCall` bagi Larastan, dan ekstensi Pest tidak membantu: jangan pakai `$this`; ambil test aktif lewat `Pest\TestSuite::getInstance()->test` (Browser) dan `Tests\Support\Clock` untuk waktu.
+- Model dari factory tidak memuat default kolom database (`is_active`): isi eksplisit di factory atau `->fresh()`.
+- `Http::fake()` pertama menang: pakai satu closure (`Tests\Support\Hibp`) agar test bisa menandai password bocor; `preventStrayRequests()` menjamin test tidak menyentuh internet.
+- Pesan "lupa password" bawaan Fortify membocorkan email terdaftar: respons gagal diganti respons sukses.
+
 ## Cara menguji pengaman (uji mutasi)
 - Rusak pengaman satu per satu, pastikan test gagal, lalu pulihkan. **Pakai skrip `bash` dengan cadangan nyata dan `cmp`**: di zsh `$FILES` tidak dipecah per kata, cadangan gagal diam-diam, dan mutasi menumpuk di file produksi (terjadi sekali; dipulihkan manual).
 - File yang belum ter-track git tidak bisa dipulihkan dengan `git checkout`.

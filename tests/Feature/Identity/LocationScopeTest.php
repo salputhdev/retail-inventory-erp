@@ -13,6 +13,7 @@ use Tests\Fixtures\Models\SampleLocatedLine;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
+use function Pest\Laravel\withSession;
 
 // ---- Kriteria 1: query otomatis terfilter ke lokasi user yang login
 it('hanya menampilkan data lokasi milik user yang login', function () {
@@ -76,6 +77,8 @@ it('akses langsung ke ID lokasi lain lewat route model binding = 404', function 
     Route::middleware('web')->get('/_test/lines/{line}', fn (SampleLocatedLine $line) => ['name' => $line->name]);
 
     actingAs($d['userA']);
+    // Sesi harus punya jam login (S-04); actingAs() tidak melewati proses login.
+    withSession(['auth.login_at' => now()->getTimestamp(), 'auth.last_activity' => now()->getTimestamp()]);
     getJson('/_test/lines/'.$d['lineA']->id)->assertOk()->assertJson(['name' => 'A-1']);
     getJson('/_test/lines/'.$d['lineB']->id)->assertNotFound()->assertDontSee('B-1');
 });
